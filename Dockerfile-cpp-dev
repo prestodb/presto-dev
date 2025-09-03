@@ -1,0 +1,60 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ARG DEPENDENCY_IMAGE=presto/prestissimo-dependency:centos9
+ARG BASE_IMAGE=quay.io/centos/centos:stream9
+FROM ${DEPENDENCY_IMAGE} as prestissimo-dev
+
+ARG OSNAME=centos
+ARG EXTRA_CMAKE_FLAGS=''
+ARG NUM_THREADS=8
+ARG ARM_BUILD_TARGET=''
+ARG CLEAN_CACHE
+
+ENV PROMPT_ALWAYS_RESPOND=n
+ENV BUILD_BASE_DIR=_build
+ENV LANG=C.UTF-8
+ENV EXTRA_CMAKE_FLAGS=${EXTRA_CMAKE_FLAGS}
+ENV BUILD_ROOT=/presto
+ENV PRESTISSIMO_HOME=/opt/prestissimo
+
+RUN --mount=type=bind,source=.,target=${BUILD_ROOT},rw \
+    --mount=type=cache,target=/root/ccache-${OSNAME} \
+    echo "[safe]" > /root/.gitconfig && \
+    echo "  directory = ${BUILD_ROOT}" >> /root/.gitconfig && \
+    echo "  directory = ${BUILD_ROOT}/presto-native-execution/velox" >> /root/.gitconfig && \
+    cat /root/.gitconfig && \
+    export CCACHE_DIR=/root/ccache-${OSNAME} && \
+    if [ "${CLEAN_CACHE}" = "true" ]; then \
+      echo "Cleaning ccache folder: /root/ccache-${OSNAME}" && \
+      rm -rf ${CCACHE_DIR}/* ; \
+    fi && \
+    mkdir -p ${PRESTISSIMO_HOME}/bin && \
+    mkdir -p ${PRESTISSIMO_HOME}/lib && \
+    cd ${BUILD_ROOT}/presto-native-execution && \
+    make release && df -h && \
+    make clean && \
+    make debug && df -h && \
+    !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server  | grep "not found") && \
+    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " ${PRESTISSIMO_HOME}/lib") }' && \
+    cp ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server ${PRESTISSIMO_HOME}/bin/presto_server && \
+    chmod 0755 ${PRESTISSIMO_HOME}/bin/presto_server && \
+    echo "${PRESTISSIMO_HOME}/lib" > /etc/ld.so.conf.d/prestissimo.conf && ldconfig && \
+    make clean && \
+    mkdir -p /opt/cache && \
+    rm -rf /opt/cache/.ccache && rm -rf /root/.ccache && \
+    cp -r ${CCACHE_DIR} /opt/cache/.ccache && \
+    ln -sf /opt/cache/.ccache /root/.ccache && \
+    ccache -sz -v
+
+COPY --chmod=0755 presto-dev/prestissimo/etc $PRESTISSIMO_HOME/etc
+COPY --chmod=0755 presto-dev/prestissimo/entrypoint.sh $PRESTISSIMO_HOME/

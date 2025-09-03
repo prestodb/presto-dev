@@ -1,0 +1,118 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ARG BASE_IMAGE=quay.io/centos/centos:stream9
+ARG CLEAN_CACHE
+
+FROM ubuntu:22.04 as builder
+
+ENV PRESTO_HOME=/opt/presto \
+    JMX_PROMETHEUS_JAVAAGENT_VERSION=0.20.0 \
+    BUILD_ROOT=/presto
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget less procps git vim diffutils curl xz-utils openjdk-17-jdk-headless && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3.11 python3.11-venv python3.11-distutils python3-pip && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+    python3 -m pip install cmake
+
+RUN --mount=type=cache,target=/root/m2 \
+    --mount=type=bind,source=..,target=${BUILD_ROOT},rw \
+    cd ${BUILD_ROOT} && \
+    export MAVEN_USER_HOME=/root/m2 && \
+    if [ "${CLEAN_CACHE}" = "true" ]; then \
+      echo "Cleaning m2 folder: ${MAVEN_USER_HOME}" && \
+      rm -rf ${MAVEN_USER_HOME}/* ; \
+    fi && \
+    ./mvnw clean install -Dmaven.repo.local=${MAVEN_USER_HOME}/repository -DskipTests && \
+    for dir in presto-*; do \
+      rm -rf /root/m2/repository/com/facebook/presto/$dir; \
+    done && \
+    mkdir -p /opt/cache && \
+    cp -a ${MAVEN_USER_HOME} /opt/cache/.m2 && \
+    mv /root/.cache /opt/cache/ && \
+    mkdir -p $PRESTO_HOME/bin && \
+    tar --strip-components=1 -C "$PRESTO_HOME" -zxf /$BUILD_ROOT/presto-server/target/presto-server-*.tar.gz \
+    && cp ${BUILD_ROOT}/presto-cli/target/presto-cli-*-executable.jar $PRESTO_HOME/bin/presto-cli \
+    && chmod 0755 $PRESTO_HOME/bin/presto-cli \
+    && ln -sf /opt/presto-cli /usr/local/bin/ \
+    && mkdir -p $PRESTO_HOME/data \
+        && mkdir -p $PRESTO_HOME/utils \
+        && curl -o $PRESTO_HOME/utils/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/$JMX_PROMETHEUS_JAVAAGENT_VERSION/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar \
+        && ln -sf $PRESTO_HOME/utils/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar $PRESTO_HOME/utils/jmx_prometheus_javaagent.jar
+
+COPY --chmod=0755 presto-dev/presto/etc $PRESTO_HOME/etc
+COPY --chmod=0755 presto-dev/presto/entrypoint.sh $PRESTO_HOME/
+
+FROM ${BASE_IMAGE} as ubuntu-dev
+
+ENV PRESTO_HOME=/opt/presto \
+    JMX_PROMETHEUS_JAVAAGENT_VERSION=0.20.0 \
+    BUILD_ROOT=/presto
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=from=builder,source=/opt,target=/builder/opt \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget less procps git vim diffutils curl xz-utils openjdk-17-jdk-headless && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3.11 python3.11-venv python3.11-distutils && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1 && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+    python3 -m pip install cmake && \
+    mkdir -p /opt/cache && \
+    mkdir -p $PRESTO_HOME && \
+    cp -a /builder${PRESTO_HOME}/* $PRESTO_HOME/ && \
+    ln -sf $PRESTO_HOME/bin/presto-cli /usr/local/bin/ && \
+    cp -a /builder/opt/cache/. /opt/cache/ && \
+    rm -rf /root/.cache && \
+    ln -sf /opt/cache/.??* /root/
+
+FROM ${BASE_IMAGE} as centos-dev
+
+ENV PYTHON_VERSION=3.11.9 \
+    JAVA_HOME=/usr/lib/jvm/jre-17-openjdk \
+    PRESTO_HOME=/opt/presto \
+    JMX_PROMETHEUS_JAVAAGENT_VERSION=0.20.0 \
+    BUILD_ROOT=/presto
+
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/usr/local/src,sharing=locked \
+    --mount=from=builder,source=/opt,target=/builder/opt \
+    dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
+    cd /usr/local/src && \
+    wget -c https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+    tar xvf Python-${PYTHON_VERSION}.tgz && \
+    cd Python-${PYTHON_VERSION} && \
+    ./configure --enable-optimizations && \
+    make -j$(nproc) && \
+    make altinstall && \
+    alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1 && \
+    alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.11 1 && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install cmake && \
+    rm -rf Python-${PYTHON_VERSION} && \
+    mkdir -p /opt/cache && \
+    mkdir -p $PRESTO_HOME && \
+    cp -a /builder${PRESTO_HOME}/* $PRESTO_HOME/ && \
+    ln -sf $PRESTO_HOME/bin/presto-cli /usr/local/bin/ && \
+    cp -a /builder/opt/cache/. /opt/cache/ && \
+    rm -rf /root/.cache && \
+    ln -sf /opt/cache/.??* /root/
+
+
