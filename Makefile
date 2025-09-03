@@ -1,13 +1,13 @@
-ORG ?= prestodb
-DOCKER_CMD ?= docker
+ORG ?= $(shell git remote get-url origin | sed -E 's|.*[:/]([^/]+)/[^/]+(\.git)?$$|\1|')
+DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
 CLEAN_CACHE ?= false
-NUM_THREADS ?= 8
-VERSION := $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
-COMMIT_ID := $(shell cd .. && git rev-parse --short origin/master)
+NUM_THREADS ?= 3
+VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
+COMMIT_ID ?= $(shell git -C .. rev-parse --short origin/master)
 
 .PHONY: build centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-dev ubuntu-dev \
 	release-prepare release-publish pull-centos pull-ubuntu tag-centos-latest tag-ubuntu-latest \
-	start-centos stop-centos start-ubuntu stop-ubuntu vscode start stop
+	stop-centos stop-ubuntu vscode start stop info shell-centos shell-ubuntu
 
 centos-dep:
 	cd ../presto-native-execution && make submodules && $(DOCKER_CMD) compose build centos-native-dependency
@@ -58,7 +58,6 @@ tag-ubuntu-latest:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest-latest ubuntu
 
 vscode:
-	echo "vscode initializing"
 	@mkdir -p ../.vscode && \
 	if [ ! -f "../.vscode/launch.json" ]; then \
 		cp ./launch.json ../.vscode/launch.json; \
@@ -66,9 +65,11 @@ vscode:
 
 start-centos: vscode pull-centos
 	${DOCKER_CMD} compose up centos-dev -d
+	${DOCKER_CMD} ps | grep presto-dev
 
 start-ubuntu: vscode pull-ubuntu
 	${DOCKER_CMD} compose up ubuntu-dev -d
+	${DOCKER_CMD} ps | grep presto-dev
 
 stop-centos:
 	${DOCKER_CMD} compose down centos-dev
@@ -76,6 +77,17 @@ stop-centos:
 stop-ubuntu:
 	${DOCKER_CMD} compose down ubuntu-dev
 
+shell-centos:
+	${DOCKER_CMD} compose exec -it centos-dev bash
+
+shell-ubuntu:
+	${DOCKER_CMD} compose exec -it ubuntu-dev bash
+
 start: start-centos
 
 stop: stop-centos
+
+shell: shell-centos
+
+info:
+	@echo ${DOCKER_CMD} ${ORG} ${VERSION} ${COMMIT_ID}

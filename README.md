@@ -6,29 +6,46 @@ This directory contains the necessary files to set up a Docker-based development
 
 *   Docker must be installed and running.
 
-## Getting Started
+## Quick start
 
 This environment can be run using either CentOS or Ubuntu.
 
-### Building the Docker images
+You need checkout this repo under your presto directory
 
-Before running the containers for the first time, you need to build the Docker images. You can build the images using the following make commands:
+```sh
+# Checkout presto-dev under presto directory
+git clone https://github.com/unidevel/presto-dev.git
 
-*   For CentOS: `make centos-dev`
-*   For Ubuntu: `make ubuntu-dev`
+# Start the docker container
+cd presto-dev
+make start
 
-### Starting the development environment
+# Enter shell
+make shell
+```
 
-To start the development environment, use one of the following commands:
+## Start presto & prestissimo server
 
-*   For CentOS: `make start-centos`
-*   For Ubuntu: `make start-ubuntu`
+```sh
+# Start container shell
+make shell
 
-These commands will start the respective Docker containers and provide you with a shell inside the container. The source code is mounted as a volume inside the container at `/presto`.
+# Start presto coordinator
+cd /opt/presto
+nohup ./entrypoint.sh &
 
-### Connecting to the container
+# Start prestissimo worker
+cd /opt/prestissimo
+nohup ./entrypoint.sh &
+```
 
-If the container is already running, you can get a shell inside it using:
+Then you can use http://localhost:8080 to open presto console
 
-*   For CentOS: `docker compose exec centos-dev bash`
-*   For Ubuntu: `docker compose exec ubuntu-dev bash`
+## Dev with vscode
+
+1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension
+2. Open `Remote Explorer` panel, switch to `Dev Containers` from the dropdown widget on the top
+3. Open the `/presto` directory in the composed container `presto-dev` (Make sure clean your local presto project, otherwist it will take a long time to import maven projects)
+4. Install microsoft `Extension Pack for Java` and `C/C++ Extension Pack`
+4. Start presto & prestissimo in the container
+5. After the java projects are imported, you can switch open debug panel, choose `Attach to prestissimo` or `Attach to presto` to start debugging
