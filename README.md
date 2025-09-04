@@ -37,6 +37,14 @@ nohup ./entrypoint.sh &
 # Start prestissimo worker
 cd /opt/prestissimo
 nohup ./entrypoint.sh &
+
+# Build presto (.m2 already cached)
+cd /presto
+./mvnw clean install -DskipTests
+
+# Build prestissimo(make debug or make release)
+cd /presto/presto-native-execution
+make
 ```
 
 Then you can use http://localhost:8080 to open presto console
@@ -50,4 +58,6 @@ Then you can use http://localhost:8080 to open presto console
 4. Start presto & prestissimo in the container
 5. After the java projects are imported, you can switch open debug panel, choose `Attach to prestissimo` or `Attach to presto` to start debugging
 
-Note: if you are using vscodium based IDE, please use https://cypherpunksamurai.github.io/vsix-downloader-webui/ to download extension and install
+~~Note: if you are using vscodium based IDE, please use https://cypherpunksamurai.github.io/vsix-downloader-webui/ to download extension and install~~
+
+Vscodium based IDE seems can not use the Remote Development plugin, seems we have to use vscode to dev inside the container
