@@ -4,7 +4,7 @@ This directory contains the necessary files to set up a Docker-based development
 
 ## Prerequisites
 
-*   Docker must be installed and running.
+*   Docker or podman must be installed and running.
 
 ## Quick start
 
@@ -49,3 +49,5 @@ Then you can use http://localhost:8080 to open presto console
 4. Install microsoft `Extension Pack for Java` and `C/C++ Extension Pack`
 4. Start presto & prestissimo in the container
 5. After the java projects are imported, you can switch open debug panel, choose `Attach to prestissimo` or `Attach to presto` to start debugging
+
+Note: if you are using vscodium based IDE, please use https://cypherpunksamurai.github.io/vsix-downloader-webui/ to download extension and install
