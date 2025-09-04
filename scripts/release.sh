@@ -21,7 +21,7 @@ VERSION=$(grep -m 1 '^    <version>' "$POM_PATH" | sed -e 's/.*<version>\([^<]*\
 echo "Version: $VERSION"
 
 # --- Get Commit ID ---
-COMMIT_ID=$(git rev-parse --short origin/master)
+COMMIT_ID=$(git -C .. rev-parse --short origin/master)
 echo "Commit ID: $COMMIT_ID"
 
 # --- Get Architecture ---
@@ -46,10 +46,10 @@ for IMAGE_INFO in "${IMAGES_TO_PROCESS[@]}"; do
 
   if [ "$MODE" = "prepare" ]; then
     echo "Tagging ${OLD_IMAGE} as ${NEW_TAG}"
-    ${DOCKER_CMD:-docker} tag "${OLD_IMAGE}" "${NEW_TAG}"
+    ${DOCKER_CMD:-docker} tag "${OLD_IMAGE}" "${NEW_TAG}" || echo "No image ${OLD_IMAGE}, skipping"
   elif [ "$MODE" = "publish" ]; then
     echo "Pushing ${NEW_TAG}"
-    ${DOCKER_CMD:-docker} push "${NEW_TAG}"
+    ${DOCKER_CMD:-docker} push "${NEW_TAG}" || echo "No image ${NEW_TAG}, skipping"
   fi
 done
 
