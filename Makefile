@@ -51,11 +51,11 @@ pull-ubuntu:
 		echo "Image docker.io/presto/presto-dev:ubuntu-22.04 already exists locally."; \
 	fi
 
-tag-centos-latest:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest-latest centos
+latest-centos:
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest centos
 
-tag-ubuntu-latest:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest-latest ubuntu
+latest-ubuntu:
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest ubuntu
 
 vscode:
 	@mkdir -p ../.vscode && \

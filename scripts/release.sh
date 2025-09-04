@@ -55,12 +55,12 @@ done
 
 if [ "$MODE" = "manifest" ]; then
   TARGET_OS=$2 # centos or ubuntu
-  echo "Creating multi-arch manifest for ${TARGET_OS}-latest..."
+  echo "Creating multi-arch manifest for latest-${TARGET_OS}..."
 
   # Construct image names for amd64 and arm64
   AMD64_IMAGE="${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${TARGET_OS}-amd64"
   ARM64_IMAGE="${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${TARGET_OS}-arm64"
-  LATEST_TAG="${ORG}/presto-dev:${TARGET_OS}-latest"
+  LATEST_TAG="docker.io/${ORG}/presto-dev:latest-${TARGET_OS}"
 
   ${DOCKER_CMD:-docker} manifest create ${LATEST_TAG} ${AMD64_IMAGE} ${ARM64_IMAGE}
   ${DOCKER_CMD:-docker} manifest annotate ${LATEST_TAG} ${AMD64_IMAGE} --os linux --arch amd64
