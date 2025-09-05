@@ -1,0 +1,3 @@
+[safe]
+	directory = /presto
+	directory = /presto/presto-native-execution/velox
