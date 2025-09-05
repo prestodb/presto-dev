@@ -3,17 +3,30 @@ DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else ec
 CLEAN_CACHE ?= false
 NUM_THREADS ?= 3
 VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
-COMMIT_ID ?= $(shell git -C .. rev-parse --short origin/master)
+COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
+VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 
 .PHONY: build centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-dev ubuntu-dev \
 	release-prepare release-publish pull-centos pull-ubuntu tag-centos-latest tag-ubuntu-latest \
 	stop-centos stop-ubuntu vscode start stop info shell-centos shell-ubuntu
 
+default: start
+
 centos-dep:
-	cd ../presto-native-execution && make submodules && $(DOCKER_CMD) compose build centos-native-dependency
+	@cd ../presto-native-execution && \
+		make submodules && \
+		if [ -f "../presto-dev/$(VELOX_SCRIPT_PATCH)" ]; then \
+			(cd velox && git stash && patch -p1 < "../../presto-dev/$(VELOX_SCRIPT_PATCH)") \
+		fi && \
+		$(DOCKER_CMD) compose build centos-native-dependency
 
 ubuntu-dep:
-	cd ../presto-native-execution && make submodules && $(DOCKER_CMD) compose build ubuntu-native-dependency
+	@cd ../presto-native-execution && \
+		make submodules && \
+		if [ -f "../presto-dev/$(VELOX_SCRIPT_PATCH)" ]; then \
+			(cd velox && git stash && patch -p1 < "../../presto-dev/$(VELOX_SCRIPT_PATCH)") \
+		fi && \
+		$(DOCKER_CMD) compose build ubuntu-native-dependency
 
 centos-cpp-dev:
 	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) centos-cpp-dev

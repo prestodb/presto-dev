@@ -21,7 +21,7 @@ VERSION=$(grep -m 1 '^    <version>' "$POM_PATH" | sed -e 's/.*<version>\([^<]*\
 echo "Version: $VERSION"
 
 # --- Get Commit ID ---
-COMMIT_ID=$(git -C .. rev-parse --short origin/master)
+COMMIT_ID=$(git -C .. rev-parse --short HEAD)
 echo "Commit ID: $COMMIT_ID"
 
 # --- Get Architecture ---

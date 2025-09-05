@@ -68,7 +68,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     --mount=from=builder,source=/opt,target=/builder/opt \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget less procps git vim diffutils curl xz-utils openjdk-17-jdk-headless && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget less procps git vim diffutils curl xz-utils openjdk-17-jdk-headless \
+        openssh-server \
+        htop atop glances nmon sysstat dstat \
+        linux-tools-common linux-tools-generic \
+        valgrind time smem \
+        iotop strace lsof smartmontools \
+        iftop nload bmon iproute2 iputils-ping iperf3 tcpdump ngrep mtr \
+        gdb ltrace systemtap systemtap-runtime binutils elfutils \
+        bpfcc-tools bpftrace bpftool && \
+    mkdir /var/run/sshd && \
+    sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's@#AuthorizedKeysFile.*@AuthorizedKeysFile .ssh/authorized_keys@' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y python3.11 python3.11-venv python3.11-distutils && \
@@ -95,6 +108,20 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/usr/local/src,sharing=locked \
     --mount=from=builder,source=/opt,target=/builder/opt \
     dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
+    dnf -y install epel-release && \
+    dnf -y install \
+        openssh-server openssh-clients \
+        htop atop glances nmon sysstat dstat \
+        perf valgrind time smem \
+        iotop strace lsof smartmontools \
+        iftop nload bmon iproute iproute-tc iputils tcpdump ngrep mtr iperf3 \
+        gdb ltrace systemtap systemtap-runtime elfutils \
+        bcc bcc-tools bpftool && \
+    mkdir /var/run/sshd && \
+    sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's@#AuthorizedKeysFile.*@AuthorizedKeysFile .ssh/authorized_keys@' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     cd /usr/local/src && \
     wget -c https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
     tar xvf Python-${PYTHON_VERSION}.tgz && \
