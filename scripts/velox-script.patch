@@ -7,8 +7,8 @@ index 594616649..bb9837c0a 100755
  function install_hdfs_deps {
    # Dependencies for Hadoop testing
 -  wget_and_untar https://archive.apache.org/dist/hadoop/common/hadoop-"${HADOOP_VERSION}"/hadoop-"${HADOOP_VERSION}".tar.gz hadoop
-+  if [ -f "${LOCAL_HADOOP_RELEASE}" ]; then
-+    cp ${LOCAL_HADOOP_RELEASE} hadoop
++  if [ -f "/scripts/hadoop-${HADOOP_VERSION}" ]; then
++    cp "/scripts/hadoop-${HADOOP_VERSION}" hadoop
 +  else
 +    wget_and_untar https://archive.apache.org/dist/hadoop/common/hadoop-"${HADOOP_VERSION}"/hadoop-"${HADOOP_VERSION}".tar.gz hadoop
 +  fi
