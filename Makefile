@@ -6,9 +6,10 @@ VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>
 COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
 VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 
-.PHONY: build centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-dev ubuntu-dev \
-	release-prepare release-publish pull-centos pull-ubuntu tag-centos-latest tag-ubuntu-latest \
-	stop-centos stop-ubuntu vscode start stop info shell-centos shell-ubuntu
+.PHONY: centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-java-dev ubuntu-java-dev \
+	centos-dev ubuntu-dev release-prepare release-publish pull-centos pull-ubuntu \
+	latest-centos latest-ubuntu start-centos start-ubuntu stop-centos stop-ubuntu \
+	start stop info shell-centos shell-ubuntu shell prepare-home
 
 default: start
 
@@ -33,6 +34,12 @@ centos-cpp-dev:
 
 ubuntu-cpp-dev:
 	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) ubuntu-cpp-dev
+
+centos-java-dev:
+	$(DOCKER_CMD) compose build centos-java-dev
+
+ubuntu-java-dev:
+	$(DOCKER_CMD) compose build ubuntu-java-dev
 
 centos-dev:
 	$(DOCKER_CMD) compose build centos-dev
@@ -70,17 +77,23 @@ latest-centos:
 latest-ubuntu:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest ubuntu
 
-vscode:
-	@mkdir -p ../.vscode && \
-	if [ ! -f "../.vscode/launch.json" ]; then \
-		cp ./launch.json ../.vscode/launch.json; \
-	fi
+prepare-home:
+	@if [ ! -f "../.vscode/launch.json" ]; then \
+		mkdir -p ../.vscode && cp ./launch.json ../.vscode/launch.json; \
+	fi; \
+	if [ ! -f root/.ssh/id_rsa ]; then \
+		mkdir -p root/.ssh && cp $(HOME)/.ssh/authorized_keys root/.ssh/authorized_keys && \
+		chmod 644 root/.ssh/authorized_keys; \
+	fi; \
+	test -e root/.m2 || test -L root/.m2 || ln -sfn /opt/cache/.m2 ./root/.m2; \
+	test -e root/.ccache || test -L root/.ccache || ln -sfn /opt/cache/.ccache ./root/.ccache; \
+	test -e root/.cache || test -L root/.cache || ln -sfn /opt/cache/.cache ./root/.cache;
 
-start-centos: vscode pull-centos
+start-centos: pull-centos prepare-home
 	${DOCKER_CMD} compose up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
-start-ubuntu: vscode pull-ubuntu
+start-ubuntu: pull-ubuntu prepare-home
 	${DOCKER_CMD} compose up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
@@ -91,10 +104,10 @@ stop-ubuntu:
 	${DOCKER_CMD} compose down ubuntu-dev
 
 shell-centos:
-	${DOCKER_CMD} compose exec -it centos-dev bash
+	${DOCKER_CMD} compose exec centos-dev bash
 
 shell-ubuntu:
-	${DOCKER_CMD} compose exec -it ubuntu-dev bash
+	${DOCKER_CMD} compose exec ubuntu-dev bash
 
 start: start-centos
 

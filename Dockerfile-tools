@@ -1,0 +1,55 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ARG BASE_IMAGE=presto/presto-java-dev:centos9
+
+FROM ${BASE_IMAGE} as ubuntu
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common wget less procps git vim diffutils curl xz-utils openjdk-17-jdk-headless \
+        openssh-server \
+        htop atop glances nmon sysstat dstat \
+        linux-tools-common linux-tools-generic \
+        valgrind time smem \
+        iotop strace lsof smartmontools \
+        iftop nload bmon iproute2 iputils-ping iperf3 tcpdump ngrep mtr \
+        gdb ltrace systemtap systemtap-runtime binutils elfutils \
+        bpfcc-tools bpftrace bpftool && \
+    mkdir /var/run/sshd && \
+    sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's@#AuthorizedKeysFile.*@AuthorizedKeysFile .ssh/authorized_keys@' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    ssh-keygen -A
+
+FROM ${BASE_IMAGE} as centos
+
+RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
+    --mount=type=cache,target=/usr/local/src,sharing=locked \
+    dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
+    dnf -y install epel-release && \
+    dnf -y install \
+        openssh-server openssh-clients \
+        htop atop glances nmon sysstat dstat \
+        perf valgrind time smem \
+        iotop strace lsof smartmontools \
+        iftop nload bmon iproute iproute-tc iputils tcpdump ngrep mtr iperf3 \
+        gdb ltrace systemtap systemtap-runtime elfutils \
+        bcc bcc-tools bpftool && \
+    mkdir /var/run/sshd && \
+    sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's@#AuthorizedKeysFile.*@AuthorizedKeysFile .ssh/authorized_keys@' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    ssh-keygen -A
