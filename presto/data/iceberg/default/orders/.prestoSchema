@@ -1,0 +1,48 @@
+{
+  "owner" : "prestoui",
+  "tableType" : "EXTERNAL_TABLE",
+  "dataColumns" : [ {
+    "name" : "orderkey",
+    "type" : "bigint"
+  }, {
+    "name" : "custkey",
+    "type" : "bigint"
+  }, {
+    "name" : "orderstatus",
+    "type" : "string"
+  }, {
+    "name" : "totalprice",
+    "type" : "double"
+  }, {
+    "name" : "orderdate",
+    "type" : "date"
+  }, {
+    "name" : "orderpriority",
+    "type" : "string"
+  }, {
+    "name" : "clerk",
+    "type" : "string"
+  }, {
+    "name" : "shippriority",
+    "type" : "int"
+  }, {
+    "name" : "comment",
+    "type" : "string"
+  } ],
+  "partitionColumns" : [ ],
+  "parameters" : {
+    "EXTERNAL" : "TRUE",
+    "metadata_location" : "file:/opt/presto/data/iceberg/default/orders/metadata/00001-ae8bb2a3-caf5-459f-970b-4e9690d81f25.metadata.json",
+    "table_type" : "iceberg",
+    "previous_metadata_location" : "file:/opt/presto/data/iceberg/default/orders/metadata/00000-b64b1d6c-1bc7-4b30-89f3-8f5de8c401b1.metadata.json"
+  },
+  "storageFormat" : {
+    "serDe" : "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+    "inputFormat" : "org.apache.hadoop.mapred.FileInputFormat",
+    "outputFormat" : "org.apache.hadoop.mapred.FileOutputFormat"
+  },
+  "storageParameters" : { },
+  "serdeParameters" : { },
+  "externalLocation" : "file:/opt/presto/data/iceberg/default/orders",
+  "columnStatistics" : { }
+}

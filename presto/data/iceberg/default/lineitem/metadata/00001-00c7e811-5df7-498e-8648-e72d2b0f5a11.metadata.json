@@ -1,0 +1,155 @@
+{
+  "format-version" : 2,
+  "table-uuid" : "be24948b-2301-43a6-8699-fb6bf7075767",
+  "location" : "file:/opt/presto/data/iceberg/default/lineitem",
+  "last-sequence-number" : 1,
+  "last-updated-ms" : 1757197184214,
+  "last-column-id" : 16,
+  "current-schema-id" : 0,
+  "schemas" : [ {
+    "type" : "struct",
+    "schema-id" : 0,
+    "fields" : [ {
+      "id" : 1,
+      "name" : "orderkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 2,
+      "name" : "partkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 3,
+      "name" : "suppkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 4,
+      "name" : "linenumber",
+      "required" : false,
+      "type" : "int"
+    }, {
+      "id" : 5,
+      "name" : "quantity",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 6,
+      "name" : "extendedprice",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 7,
+      "name" : "discount",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 8,
+      "name" : "tax",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 9,
+      "name" : "returnflag",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 10,
+      "name" : "linestatus",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 11,
+      "name" : "shipdate",
+      "required" : false,
+      "type" : "date"
+    }, {
+      "id" : 12,
+      "name" : "commitdate",
+      "required" : false,
+      "type" : "date"
+    }, {
+      "id" : 13,
+      "name" : "receiptdate",
+      "required" : false,
+      "type" : "date"
+    }, {
+      "id" : 14,
+      "name" : "shipinstruct",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 15,
+      "name" : "shipmode",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 16,
+      "name" : "comment",
+      "required" : false,
+      "type" : "string"
+    } ]
+  } ],
+  "default-spec-id" : 0,
+  "partition-specs" : [ {
+    "spec-id" : 0,
+    "fields" : [ ]
+  } ],
+  "last-partition-id" : 999,
+  "default-sort-order-id" : 0,
+  "sort-orders" : [ {
+    "order-id" : 0,
+    "fields" : [ ]
+  } ],
+  "properties" : {
+    "write.format.default" : "PARQUET",
+    "write.delete.mode" : "merge-on-read",
+    "write.metadata.previous-versions-max" : "100",
+    "write.parquet.compression-codec" : "GZIP",
+    "write.metadata.metrics.max-inferred-column-defaults" : "100",
+    "write.metadata.delete-after-commit.enabled" : "false",
+    "commit.retry.num-retries" : "4",
+    "write.update.mode" : "merge-on-read",
+    "read.split.target-size" : "134217728"
+  },
+  "current-snapshot-id" : 992268253060816918,
+  "refs" : {
+    "main" : {
+      "snapshot-id" : 992268253060816918,
+      "type" : "branch"
+    }
+  },
+  "snapshots" : [ {
+    "sequence-number" : 1,
+    "snapshot-id" : 992268253060816918,
+    "timestamp-ms" : 1757197184214,
+    "summary" : {
+      "operation" : "append",
+      "presto_query_id" : "20250906_221944_00008_3yaed",
+      "added-data-files" : "1",
+      "added-records" : "10",
+      "added-files-size" : "3849",
+      "changed-partition-count" : "1",
+      "total-records" : "10",
+      "total-files-size" : "3849",
+      "total-data-files" : "1",
+      "total-delete-files" : "0",
+      "total-position-deletes" : "0",
+      "total-equality-deletes" : "0",
+      "iceberg-version" : "Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)"
+    },
+    "manifest-list" : "file:/opt/presto/data/iceberg/default/lineitem/metadata/snap-992268253060816918-1-fe675606-778a-45e5-b217-3b43e97be067.avro",
+    "schema-id" : 0
+  } ],
+  "statistics" : [ ],
+  "partition-statistics" : [ ],
+  "snapshot-log" : [ {
+    "timestamp-ms" : 1757197184214,
+    "snapshot-id" : 992268253060816918
+  } ],
+  "metadata-log" : [ {
+    "timestamp-ms" : 1757197177782,
+    "metadata-file" : "file:/opt/presto/data/iceberg/default/lineitem/metadata/00000-eb3b1351-bb29-48b0-8eb4-8de768e027a5.metadata.json"
+  } ]
+}

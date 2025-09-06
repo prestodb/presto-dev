@@ -1,0 +1,69 @@
+{
+  "owner" : "prestoui",
+  "tableType" : "EXTERNAL_TABLE",
+  "dataColumns" : [ {
+    "name" : "orderkey",
+    "type" : "bigint"
+  }, {
+    "name" : "partkey",
+    "type" : "bigint"
+  }, {
+    "name" : "suppkey",
+    "type" : "bigint"
+  }, {
+    "name" : "linenumber",
+    "type" : "int"
+  }, {
+    "name" : "quantity",
+    "type" : "double"
+  }, {
+    "name" : "extendedprice",
+    "type" : "double"
+  }, {
+    "name" : "discount",
+    "type" : "double"
+  }, {
+    "name" : "tax",
+    "type" : "double"
+  }, {
+    "name" : "returnflag",
+    "type" : "string"
+  }, {
+    "name" : "linestatus",
+    "type" : "string"
+  }, {
+    "name" : "shipdate",
+    "type" : "date"
+  }, {
+    "name" : "commitdate",
+    "type" : "date"
+  }, {
+    "name" : "receiptdate",
+    "type" : "date"
+  }, {
+    "name" : "shipinstruct",
+    "type" : "string"
+  }, {
+    "name" : "shipmode",
+    "type" : "string"
+  }, {
+    "name" : "comment",
+    "type" : "string"
+  } ],
+  "partitionColumns" : [ ],
+  "parameters" : {
+    "EXTERNAL" : "TRUE",
+    "metadata_location" : "file:/opt/presto/data/iceberg/default/lineitem/metadata/00001-00c7e811-5df7-498e-8648-e72d2b0f5a11.metadata.json",
+    "table_type" : "iceberg",
+    "previous_metadata_location" : "file:/opt/presto/data/iceberg/default/lineitem/metadata/00000-eb3b1351-bb29-48b0-8eb4-8de768e027a5.metadata.json"
+  },
+  "storageFormat" : {
+    "serDe" : "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+    "inputFormat" : "org.apache.hadoop.mapred.FileInputFormat",
+    "outputFormat" : "org.apache.hadoop.mapred.FileOutputFormat"
+  },
+  "storageParameters" : { },
+  "serdeParameters" : { },
+  "externalLocation" : "file:/opt/presto/data/iceberg/default/lineitem",
+  "columnStatistics" : { }
+}

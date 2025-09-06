@@ -1,0 +1,88 @@
+{
+  "format-version" : 2,
+  "table-uuid" : "23d8c90b-649b-4525-bef7-24eaf79aa9b9",
+  "location" : "file:/opt/presto/data/iceberg/default/orders",
+  "last-sequence-number" : 0,
+  "last-updated-ms" : 1757197164181,
+  "last-column-id" : 9,
+  "current-schema-id" : 0,
+  "schemas" : [ {
+    "type" : "struct",
+    "schema-id" : 0,
+    "fields" : [ {
+      "id" : 1,
+      "name" : "orderkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 2,
+      "name" : "custkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 3,
+      "name" : "orderstatus",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 4,
+      "name" : "totalprice",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 5,
+      "name" : "orderdate",
+      "required" : false,
+      "type" : "date"
+    }, {
+      "id" : 6,
+      "name" : "orderpriority",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 7,
+      "name" : "clerk",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 8,
+      "name" : "shippriority",
+      "required" : false,
+      "type" : "int"
+    }, {
+      "id" : 9,
+      "name" : "comment",
+      "required" : false,
+      "type" : "string"
+    } ]
+  } ],
+  "default-spec-id" : 0,
+  "partition-specs" : [ {
+    "spec-id" : 0,
+    "fields" : [ ]
+  } ],
+  "last-partition-id" : 999,
+  "default-sort-order-id" : 0,
+  "sort-orders" : [ {
+    "order-id" : 0,
+    "fields" : [ ]
+  } ],
+  "properties" : {
+    "write.format.default" : "PARQUET",
+    "write.delete.mode" : "merge-on-read",
+    "write.metadata.previous-versions-max" : "100",
+    "write.parquet.compression-codec" : "GZIP",
+    "write.metadata.metrics.max-inferred-column-defaults" : "100",
+    "write.metadata.delete-after-commit.enabled" : "false",
+    "commit.retry.num-retries" : "4",
+    "write.update.mode" : "merge-on-read",
+    "read.split.target-size" : "134217728"
+  },
+  "current-snapshot-id" : -1,
+  "refs" : { },
+  "snapshots" : [ ],
+  "statistics" : [ ],
+  "partition-statistics" : [ ],
+  "snapshot-log" : [ ],
+  "metadata-log" : [ ]
+}

@@ -1,0 +1,115 @@
+{
+  "format-version" : 2,
+  "table-uuid" : "7900a8b5-f647-41ce-9496-52d3450d5681",
+  "location" : "file:/opt/presto/data/iceberg/default/customer",
+  "last-sequence-number" : 1,
+  "last-updated-ms" : 1757197154194,
+  "last-column-id" : 8,
+  "current-schema-id" : 0,
+  "schemas" : [ {
+    "type" : "struct",
+    "schema-id" : 0,
+    "fields" : [ {
+      "id" : 1,
+      "name" : "custkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 2,
+      "name" : "name",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 3,
+      "name" : "address",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 4,
+      "name" : "nationkey",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 5,
+      "name" : "phone",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 6,
+      "name" : "acctbal",
+      "required" : false,
+      "type" : "double"
+    }, {
+      "id" : 7,
+      "name" : "mktsegment",
+      "required" : false,
+      "type" : "string"
+    }, {
+      "id" : 8,
+      "name" : "comment",
+      "required" : false,
+      "type" : "string"
+    } ]
+  } ],
+  "default-spec-id" : 0,
+  "partition-specs" : [ {
+    "spec-id" : 0,
+    "fields" : [ ]
+  } ],
+  "last-partition-id" : 999,
+  "default-sort-order-id" : 0,
+  "sort-orders" : [ {
+    "order-id" : 0,
+    "fields" : [ ]
+  } ],
+  "properties" : {
+    "write.format.default" : "PARQUET",
+    "write.delete.mode" : "merge-on-read",
+    "write.metadata.previous-versions-max" : "100",
+    "write.parquet.compression-codec" : "GZIP",
+    "write.metadata.metrics.max-inferred-column-defaults" : "100",
+    "write.metadata.delete-after-commit.enabled" : "false",
+    "commit.retry.num-retries" : "4",
+    "write.update.mode" : "merge-on-read",
+    "read.split.target-size" : "134217728"
+  },
+  "current-snapshot-id" : 42533491556777316,
+  "refs" : {
+    "main" : {
+      "snapshot-id" : 42533491556777316,
+      "type" : "branch"
+    }
+  },
+  "snapshots" : [ {
+    "sequence-number" : 1,
+    "snapshot-id" : 42533491556777316,
+    "timestamp-ms" : 1757197154194,
+    "summary" : {
+      "operation" : "append",
+      "presto_query_id" : "20250906_221913_00004_3yaed",
+      "added-data-files" : "1",
+      "added-records" : "10",
+      "added-files-size" : "2106",
+      "changed-partition-count" : "1",
+      "total-records" : "10",
+      "total-files-size" : "2106",
+      "total-data-files" : "1",
+      "total-delete-files" : "0",
+      "total-position-deletes" : "0",
+      "total-equality-deletes" : "0",
+      "iceberg-version" : "Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)"
+    },
+    "manifest-list" : "file:/opt/presto/data/iceberg/default/customer/metadata/snap-42533491556777316-1-c56c42a5-0f01-4e8e-a1f1-6082756c0437.avro",
+    "schema-id" : 0
+  } ],
+  "statistics" : [ ],
+  "partition-statistics" : [ ],
+  "snapshot-log" : [ {
+    "timestamp-ms" : 1757197154194,
+    "snapshot-id" : 42533491556777316
+  } ],
+  "metadata-log" : [ {
+    "timestamp-ms" : 1757197143506,
+    "metadata-file" : "file:/opt/presto/data/iceberg/default/customer/metadata/00000-756abfb6-4283-42e3-88f3-fc933d785358.metadata.json"
+  } ]
+}

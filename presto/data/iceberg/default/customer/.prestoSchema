@@ -1,0 +1,45 @@
+{
+  "owner" : "prestoui",
+  "tableType" : "EXTERNAL_TABLE",
+  "dataColumns" : [ {
+    "name" : "custkey",
+    "type" : "bigint"
+  }, {
+    "name" : "name",
+    "type" : "string"
+  }, {
+    "name" : "address",
+    "type" : "string"
+  }, {
+    "name" : "nationkey",
+    "type" : "bigint"
+  }, {
+    "name" : "phone",
+    "type" : "string"
+  }, {
+    "name" : "acctbal",
+    "type" : "double"
+  }, {
+    "name" : "mktsegment",
+    "type" : "string"
+  }, {
+    "name" : "comment",
+    "type" : "string"
+  } ],
+  "partitionColumns" : [ ],
+  "parameters" : {
+    "EXTERNAL" : "TRUE",
+    "metadata_location" : "file:/opt/presto/data/iceberg/default/customer/metadata/00001-8853b3e8-a616-4f93-8f68-0d55d743732b.metadata.json",
+    "table_type" : "iceberg",
+    "previous_metadata_location" : "file:/opt/presto/data/iceberg/default/customer/metadata/00000-756abfb6-4283-42e3-88f3-fc933d785358.metadata.json"
+  },
+  "storageFormat" : {
+    "serDe" : "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+    "inputFormat" : "org.apache.hadoop.mapred.FileInputFormat",
+    "outputFormat" : "org.apache.hadoop.mapred.FileOutputFormat"
+  },
+  "storageParameters" : { },
+  "serdeParameters" : { },
+  "externalLocation" : "file:/opt/presto/data/iceberg/default/customer",
+  "columnStatistics" : { }
+}
