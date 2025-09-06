@@ -49,13 +49,13 @@ RUN --mount=type=cache,target=/root/m2 \
     tar --strip-components=1 -C "$PRESTO_HOME" -zxf /$BUILD_ROOT/presto-server/target/presto-server-*.tar.gz \
     && cp ${BUILD_ROOT}/presto-cli/target/presto-cli-*-executable.jar $PRESTO_HOME/bin/presto-cli \
     && chmod 0755 $PRESTO_HOME/bin/presto-cli \
-    && ln -sf /opt/presto-cli /usr/local/bin/ \
     && mkdir -p $PRESTO_HOME/data \
         && mkdir -p $PRESTO_HOME/utils \
         && curl -o $PRESTO_HOME/utils/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/$JMX_PROMETHEUS_JAVAAGENT_VERSION/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar \
         && ln -sf $PRESTO_HOME/utils/jmx_prometheus_javaagent-$JMX_PROMETHEUS_JAVAAGENT_VERSION.jar $PRESTO_HOME/utils/jmx_prometheus_javaagent.jar
 
 COPY --chmod=0755 presto-dev/presto/etc $PRESTO_HOME/etc
+COPY --chmod=0755 presto-dev/presto/data $PRESTO_HOME/data
 COPY --chmod=0755 presto-dev/presto/entrypoint.sh $PRESTO_HOME/
 
 FROM ${BASE_IMAGE} as ubuntu

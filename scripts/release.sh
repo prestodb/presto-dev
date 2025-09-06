@@ -42,7 +42,7 @@ IMAGES_TO_PROCESS=(
 
 for IMAGE_INFO in "${IMAGES_TO_PROCESS[@]}"; do
   read -r OLD_IMAGE OS <<<"$IMAGE_INFO"
-  NEW_TAG="${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${OS}-${ARCH}"
+  NEW_TAG="docker.io/${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${OS}-${ARCH}"
 
   if [ "$MODE" = "prepare" ]; then
     echo "Tagging ${OLD_IMAGE} as ${NEW_TAG}"

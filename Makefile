@@ -4,12 +4,14 @@ CLEAN_CACHE ?= false
 NUM_THREADS ?= 3
 VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
 COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
+TIMESTAMP ?= $(shell date '+%Y%m%d%H%M%S')
 VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 
 .PHONY: centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-java-dev ubuntu-java-dev \
 	centos-dev ubuntu-dev release-prepare release-publish pull-centos pull-ubuntu \
 	latest-centos latest-ubuntu start-centos start-ubuntu stop-centos stop-ubuntu \
-	start stop info shell-centos shell-ubuntu shell prepare-home
+	start stop info shell-centos shell-ubuntu shell prepare-home pull \
+	centos-update-ccache ubuntu-update-ccache
 
 default: start
 
@@ -46,6 +48,22 @@ centos-dev:
 
 ubuntu-dev:
 	$(DOCKER_CMD) compose build ubuntu-dev
+
+centos-update-ccache:
+	$(DOCKER_CMD) tag docker.io/presto/presto-dev:centos9 docker.io/presto/presto-dev:centos-$(TIMESTAMP)
+	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+		--build-arg NUM_THREADS=$(NUM_THREADS) \
+		--build-arg CACHE_OPTION=update \
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) centos-cpp-dev
+	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:centos9 docker.io/presto/presto-dev:centos9
+
+ubuntu-update-ccache:
+	$(DOCKER_CMD) tag docker.io/presto/presto-dev:ubuntu-22.04 docker.io/presto/presto-dev:ubuntu-$(TIMESTAMP)
+	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+		--build-arg NUM_THREADS=$(NUM_THREADS) \
+		--build-arg CACHE_OPTION=update \
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) ubuntu-cpp-dev
+	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:ubuntu-22.04 docker.io/presto/presto-cpp-dev:ubuntu-22.04
 
 release-prepare:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh prepare
@@ -111,6 +129,8 @@ start: start-centos
 stop: stop-centos
 
 shell: shell-centos
+
+pull: pull-centos
 
 info:
 	@echo ${DOCKER_CMD} ${ORG} ${VERSION} ${COMMIT_ID}
