@@ -101,6 +101,8 @@ services:
     volumes:
       - ..:/presto
       - ./root:/root
+      - ./presto/etc:/opt/presto/etc
+      - ./prestissimo/etc:/opt/prestissimo/etc
     working_dir: /presto
     ports:
     - 8080:8080
@@ -125,6 +127,8 @@ services:
     volumes:
       - ..:/presto
       - ./root:/root
+      - ./presto/etc:/opt/presto/etc
+      - ./prestissimo/etc:/opt/prestissimo/etc
     working_dir: /presto/presto-native-execution
     ports:
     - 8080:8080
