@@ -1,0 +1,72 @@
+{
+  "owner" : "root",
+  "tableType" : "MANAGED_TABLE",
+  "dataColumns" : [ {
+    "name" : "orderkey",
+    "type" : "bigint"
+  }, {
+    "name" : "partkey",
+    "type" : "bigint"
+  }, {
+    "name" : "suppkey",
+    "type" : "bigint"
+  }, {
+    "name" : "linenumber",
+    "type" : "int"
+  }, {
+    "name" : "quantity",
+    "type" : "double"
+  }, {
+    "name" : "extendedprice",
+    "type" : "double"
+  }, {
+    "name" : "discount",
+    "type" : "double"
+  }, {
+    "name" : "tax",
+    "type" : "double"
+  }, {
+    "name" : "returnflag",
+    "type" : "string"
+  }, {
+    "name" : "linestatus",
+    "type" : "string"
+  }, {
+    "name" : "shipdate",
+    "type" : "date"
+  }, {
+    "name" : "commitdate",
+    "type" : "date"
+  }, {
+    "name" : "receiptdate",
+    "type" : "date"
+  }, {
+    "name" : "shipinstruct",
+    "type" : "string"
+  }, {
+    "name" : "shipmode",
+    "type" : "string"
+  }, {
+    "name" : "comment",
+    "type" : "string"
+  } ],
+  "partitionColumns" : [ ],
+  "parameters" : {
+    "presto_version" : "0.295-SNAPSHOT",
+    "presto_query_id" : "20250906_115427_00022_d9b6j",
+    "numFiles" : "1",
+    "numRows" : "10",
+    "rawDataSize" : "2336",
+    "totalSize" : "5196"
+  },
+  "storageFormat" : {
+    "serDe" : "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+    "inputFormat" : "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+    "outputFormat" : "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+  },
+  "storageParameters" : {
+    "preferred_ordering_columns" : ""
+  },
+  "serdeParameters" : { },
+  "columnStatistics" : { }
+}

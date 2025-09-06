@@ -102,6 +102,7 @@ services:
       - ..:/presto
       - ./root:/root
       - ./presto/etc:/opt/presto/etc
+      - ./presto/data:/opt/presto/data
       - ./prestissimo/etc:/opt/prestissimo/etc
     working_dir: /presto
     ports:
@@ -128,6 +129,7 @@ services:
       - ..:/presto
       - ./root:/root
       - ./presto/etc:/opt/presto/etc
+      - ./presto/data:/opt/presto/data
       - ./prestissimo/etc:/opt/prestissimo/etc
     working_dir: /presto/presto-native-execution
     ports:

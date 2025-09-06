@@ -1,0 +1,51 @@
+{
+  "owner" : "root",
+  "tableType" : "MANAGED_TABLE",
+  "dataColumns" : [ {
+    "name" : "orderkey",
+    "type" : "bigint"
+  }, {
+    "name" : "custkey",
+    "type" : "bigint"
+  }, {
+    "name" : "orderstatus",
+    "type" : "string"
+  }, {
+    "name" : "totalprice",
+    "type" : "double"
+  }, {
+    "name" : "orderdate",
+    "type" : "date"
+  }, {
+    "name" : "orderpriority",
+    "type" : "string"
+  }, {
+    "name" : "clerk",
+    "type" : "string"
+  }, {
+    "name" : "shippriority",
+    "type" : "int"
+  }, {
+    "name" : "comment",
+    "type" : "string"
+  } ],
+  "partitionColumns" : [ ],
+  "parameters" : {
+    "presto_version" : "0.295-SNAPSHOT",
+    "presto_query_id" : "20250906_115427_00020_d9b6j",
+    "numFiles" : "1",
+    "numRows" : "10",
+    "rawDataSize" : "1504",
+    "totalSize" : "2950"
+  },
+  "storageFormat" : {
+    "serDe" : "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+    "inputFormat" : "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+    "outputFormat" : "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+  },
+  "storageParameters" : {
+    "preferred_ordering_columns" : ""
+  },
+  "serdeParameters" : { },
+  "columnStatistics" : { }
+}
