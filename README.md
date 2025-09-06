@@ -29,6 +29,7 @@ make shell
 ```sh
 # Start container shell
 make shell
+ls -la /root
 
 # Start presto coordinator
 cd /opt/presto
@@ -49,7 +50,7 @@ make
 
 Then you can use http://localhost:8080 to open presto console
 
-## Dev with vscode
+## Dev with dev container(VSCode)
 
 1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension
 2. Open `Remote Explorer` panel, switch to `Dev Containers` from the dropdown widget on the top
@@ -58,6 +59,40 @@ Then you can use http://localhost:8080 to open presto console
 4. Start presto & prestissimo in the container
 5. After the java projects are imported, you can switch open debug panel, choose `Attach to prestissimo` or `Attach to presto` to start debugging
 
-~~Note: if you are using vscodium based IDE, please use https://cypherpunksamurai.github.io/vsix-downloader-webui/ to download extension and install~~
+## Dev with ssh(will publish new image later)
 
-Vscodium based IDE seems can not use the Remote Development plugin, seems we have to use vscode to dev inside the container
+Vscodium based IDEs can not use the Remote Development extension, if your IDE supports remote ssh extension, you can try this:
+
+1. Make sure you have generated ssh keys and updated the `authorized_keys` file in your local machine
+2. Use `make start` to start the container, it will copy the ssh keys to the root/.ssh directory
+3. Update your local ~/.ssh/config file with the following content:
+```
+Host presto-dev
+  HostName localhost
+  Port 2222
+  User root
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+```
+4. Test the ssh connection with `ssh presto-dev`
+5. Start vscode in the container, if everything is ok, run `ls -la /root` to see what files are in your root directory
+6. Connect to the ssh server `presto-dev` with your IDE
+
+## Keep your data
+
+By default, the `root` directory in the this repo will be mounted to `/root` in the container as home directory, you can share your data between your local machine and the container.
+
+If you want to keep ccache/m2/cache locally, after start the shell for the first time, run the commands below
+
+```
+ls -la /root
+
+rm -f /root/.ccache
+cp -a /opt/cache/.ccache /root/.ccache
+
+rm -f /root/.m2
+cp -a /opt/cache/.m2 /root/.m2
+
+rm -f /root/.cache
+cp -a /opt/cache/.cache /root/.cache
+```

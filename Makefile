@@ -54,22 +54,12 @@ release-publish:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh publish
 
 pull-centos:
-	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:centos9)" ]; then \
-		echo "Image not found locally. Pulling..."; \
-		$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-centos; \
-		$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-centos docker.io/presto/presto-dev:centos9; \
-	else \
-		echo "Image docker.io/presto/presto-dev:centos9 already exists locally."; \
-	fi
+	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-centos
+	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-centos docker.io/presto/presto-dev:centos9
 
 pull-ubuntu:
-	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:ubuntu-22.04)" ]; then \
-		echo "Image not found locally. Pulling..."; \
-		$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-ubuntu; \
-		$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-ubuntu docker.io/presto/presto-dev:ubuntu-22.04; \
-	else \
-		echo "Image docker.io/presto/presto-dev:ubuntu-22.04 already exists locally."; \
-	fi
+	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-ubuntu
+	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-ubuntu docker.io/presto/presto-dev:ubuntu-22.04
 
 latest-centos:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest centos
@@ -89,11 +79,18 @@ prepare-home:
 	test -e root/.ccache || test -L root/.ccache || ln -sfn /opt/cache/.ccache ./root/.ccache; \
 	test -e root/.cache || test -L root/.cache || ln -sfn /opt/cache/.cache ./root/.cache;
 
-start-centos: pull-centos prepare-home
+start-centos: prepare-home
+	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:ubuntu-22.04)" ]; then \
+		make pull-centos; \
+	fi
 	${DOCKER_CMD} compose up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
-start-ubuntu: pull-ubuntu prepare-home
+start-ubuntu: prepare-home
+	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:ubuntu-22.04)" ]; then \
+		echo "Image not found locally. Pulling..."; \
+		make pull-ubuntu; \
+	fi
 	${DOCKER_CMD} compose up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
