@@ -13,7 +13,7 @@ VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 	start stop info shell-centos shell-ubuntu shell prepare-home pull \
 	centos-update-ccache ubuntu-update-ccache
 
-default: start
+default: start shell
 
 centos-dep:
 	@cd ../presto-native-execution && \
@@ -99,6 +99,7 @@ prepare-home:
 
 start-centos: prepare-home
 	@if [ -z "$$($(DOCKER_CMD) images -q presto/presto-dev:centos9)" ]; then \
+		echo "Image not found locally. Pulling..."; \
 		make pull-centos; \
 	fi
 	${DOCKER_CMD} compose up centos-dev -d
