@@ -98,14 +98,14 @@ prepare-home:
 	test -e root/.cache || test -L root/.cache || ln -sfn /opt/cache/.cache ./root/.cache;
 
 start-centos: prepare-home
-	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:ubuntu-22.04)" ]; then \
+	@if [ -z "$$($(DOCKER_CMD) images -q presto/presto-dev:centos9)" ]; then \
 		make pull-centos; \
 	fi
 	${DOCKER_CMD} compose up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 start-ubuntu: prepare-home
-	@if [ -z "$$($(DOCKER_CMD) images -q docker.io/presto/presto-dev:ubuntu-22.04)" ]; then \
+	@if [ -z "$$($(DOCKER_CMD) images -q presto/presto-dev:ubuntu-22.04)" ]; then \
 		echo "Image not found locally. Pulling..."; \
 		make pull-ubuntu; \
 	fi

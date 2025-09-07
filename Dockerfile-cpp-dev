@@ -29,7 +29,7 @@ ENV PRESTISSIMO_HOME=/opt/prestissimo
 
 RUN --mount=type=bind,source=.,target=${BUILD_ROOT},rw \
     --mount=type=cache,target=/root/ccache-${OSNAME} \
-    if [ "${CACHE_OPTION}" != "update" ]; then \
+    if [ "${CACHE_OPTION}" = "update" ]; then \
       echo "Updating ccache data"; \
       ccache -sz -v; \
     else \
