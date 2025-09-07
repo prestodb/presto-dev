@@ -1,4 +1,4 @@
-ORG ?= $(shell git remote get-url origin | sed -E 's|.*[:/]([^/]+)/[^/]+(\.git)?$$|\1|')
+ORG ?= unidevel
 DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
 CLEAN_CACHE ?= false
 NUM_THREADS ?= 3
