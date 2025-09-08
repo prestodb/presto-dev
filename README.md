@@ -33,11 +33,9 @@ make pull
 
 ## Start presto & prestissimo server
 
-Note: all the commands below need to be executed inside the container shell.
+Note: all the commands below need to be executed inside the container shell, execute `make shell` under presto-dev directory to open a new container shell.
 
 ```sh
-# Start container shell
-make shell
 ls -la /root
 
 # Start presto coordinator
