@@ -11,7 +11,7 @@ VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 	centos-dev ubuntu-dev release-prepare release-publish pull-centos pull-ubuntu \
 	latest-centos latest-ubuntu start-centos start-ubuntu stop-centos stop-ubuntu \
 	start stop info shell-centos shell-ubuntu shell prepare-home pull \
-	centos-update-ccache ubuntu-update-ccache
+	centos-update-ccache ubuntu-update-ccache down down-centos down-ubuntu
 
 default: start shell
 
@@ -113,11 +113,17 @@ start-ubuntu: prepare-home
 	${DOCKER_CMD} compose up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
-stop-centos:
+down-centos:
 	${DOCKER_CMD} compose down centos-dev
 
-stop-ubuntu:
+down-ubuntu:
 	${DOCKER_CMD} compose down ubuntu-dev
+
+stop-centos:
+	${DOCKER_CMD} compose stop centos-dev
+
+stop-ubuntu:
+	${DOCKER_CMD} compose stop ubuntu-dev
 
 shell-centos:
 	${DOCKER_CMD} compose exec centos-dev bash
@@ -128,6 +134,8 @@ shell-ubuntu:
 start: start-centos
 
 stop: stop-centos
+
+down: down-centos
 
 shell: shell-centos
 
