@@ -1,19 +1,19 @@
-# Presto Development Environment
+# Presto Docker development environment
 
-This directory contains the necessary files to set up a Docker-based development environment for Presto.
+* https://hub.docker.com/r/unidevel/presto-dev
 
 ## Prerequisites
 
-*   Docker or podman must be installed and running.
+* Docker or Podman must be installed and running.
 
 ## Quick start
 
-This environment can be run using either Linux or MacOS.
+This environment can be run on both Linux and macOS.
 
-You need checkout this repo under your presto directory.
+Run the following command to clone the `presto-dev` repository into your local `presto` directory and start the development environment.
 
 ```sh
-# Checkout presto-dev under presto directory
+# Inside your local presto directory
 git clone https://github.com/unidevel/presto-dev.git
 
 # Start the docker container
@@ -24,16 +24,18 @@ make start
 make shell
 ```
 
-When new presto-dev image published, you can run the command below to pull the latest image.
+When a new `presto-dev` image is published, run the following command to pull the latest version.
 
 ```sh
 # Under presto-dev, run this to pull the latest presto-dev image
 make pull
 ```
 
-## Start presto & prestissimo server
+## Start Presto & Prestissimo server
 
-Note: all the commands below need to be executed inside the container shell, execute `make shell` under presto-dev directory to open a new container shell.
+Run `make shell` in the presto-dev directory to open a new container shell. 
+
+All the commands below must be executed inside the container shell. 
 
 ```sh
 ls -la /root
@@ -55,37 +57,37 @@ cd /presto/presto-native-execution
 make
 ```
 
-Then you can use http://localhost:8080 to open presto console
+Use http://localhost:8080 to open the Presto console.
 
-## Update presto or prestissimo configuration
+## Update Presto or Prestissimo configuration
 
-The configuration files are located at the [presto/etc](./presto/etc) and [prestissimo/etc](./prestissimo/etc) directories.
+The configuration files are in the [presto/etc](https://github.com/unidevel/presto-dev/tree/main/presto/etc) and [prestissimo/etc](https://github.com/unidevel/presto-dev/tree/main/prestissimo/etc) directories.
+
+In the container, they are mounted as `/opt/presto/etc` and `/opt/prestissimo/etc` respectively.
 
 You can add more catalogs or update the configuration files.
 
-In the container, they will be mounted as `/opt/presto/etc` and `/opt/prestissimo/etc` respectively.
-
-The [presto/data](./presto/data) will also be mounted as `/opt/presto/data`.
+The [presto/data](https://github.com/unidevel/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data`.
 
 In this way, you can update and keep them locally in case the container is deleted.
 
 ## Dev with dev container(VSCode)
 
-1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension
-2. Open `Remote Explorer` panel, switch to `Dev Containers` from the drop down widget on the top
-3. Open the `/presto` directory in the composed container `presto-dev` (Make sure clean your local presto project, otherwist it will take a long time to import maven projects)
-4. The file [launch.json](./launch.json) will be copied to your `presto/.vscode` if not configured before. Please append the content of [launch.json](./launch.json) in this repository to your `presto/.vscode/launch.json` if configured before.
-5. Install Microsoft [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) and [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) in the container
-6. Start presto & prestissimo in the container
-7. After the java projects are imported, you can switch open debug panel, choose `Attach to prestissimo` or `Attach to presto` to start debugging
+1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension.
+2. Open `Remote Explorer` panel, switch to `Dev Containers` from the drop down widget on the top.
+3. Open the `/presto` directory in the composed container `presto-dev` (If importing Maven projects takes a long time, run `./mvnw clean` in the `/presto` directory and `make clean` in the `/presto/presto-native-execution` directory inside the container.).
+4. If `presto/.vscode/launch.json` is not already configured, the file [launch.json](https://github.com/unidevel/presto-dev/tree/main/launch.json) is copied there automatically. If it is already configured, append the contents of [launch.json](https://github.com/unidevel/presto-dev/tree/main/launch.json) from this repository to your existing `presto/.vscode/launch.json`.
+5. Install Microsoft [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) and [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) in the container.
+6. Start Presto & Prestissimo in the container.
+7. After the Java projects are imported, open the Debug panel and select either `Attach to Prestissimo` or `Attach to Presto` to start debugging.
 
 ## Dev with ssh
 
-Vscodium based IDEs can not use the Remote Development extension, if your IDE supports remote ssh extension, you can try this:
+VSCodium based IDEs cannot use the Remote Development extension. If your IDE supports remote ssh extension, you can try this:
 
-1. Make sure you have generated ssh keys and updated the `authorized_keys` file in your local machine
-2. Use `make start` to start the container, it will copy the ssh keys to the root/.ssh directory
-3. Update your local ~/.ssh/config file with the following content:
+1. Make sure you have generated ssh keys and updated the `authorized_keys` file in your local machine.
+2. Use `make start` to start the container. This will copy your SSH keys from `~/.ssh/authorized_keys` to the `root/.ssh` directory inside `presto-dev`.
+3. Add the following entry to your local `~/.ssh/config` file:
 ```
 Host presto-dev
   HostName localhost
@@ -94,15 +96,14 @@ Host presto-dev
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
 ```
-4. Test the ssh connection with `ssh presto-dev`
-5. In the container, run `ls -la /root` to list the files in your root directory
-6. Connect to the ssh server `presto-dev` with your IDE
+4. Test the ssh connection with `ssh presto-dev`.
+5. Connect to the `presto-dev` SSH server using your IDE.
 
 ## Keep your data
 
-By default, the `root` directory in the this repo will be mounted to `/root` in the container as home directory, you can share your data between your local machine and the container.
+By default, the `root` directory in this repo will be mounted to `/root` in the container. Use this `root` directory to share your data between your local machine and the container.
 
-If you want to keep ccache/m2/cache locally, after start the shell for the first time, run the commands below
+To keep `ccache`, `m2`, and other cache files locally, run the following commands after starting the shell for the first time. This will copy the cache files into your local root folder.
 
 ```sh
 ls -la /root
@@ -116,3 +117,4 @@ cp -a /opt/cache/.m2 /root/.m2
 rm -f /root/.cache
 cp -a /opt/cache/.cache /root/.cache
 ```
+
