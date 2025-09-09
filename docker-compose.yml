@@ -14,7 +14,7 @@ services:
     # Usage:
     #   docker compose build ubuntu-cpp-dev
     #   podman compose build ubuntu-cpp-dev
-    image: presto/presto-cpp-dev:ubuntu-22.04
+    image: docker.io/presto/presto-cpp-dev:ubuntu-22.04
     build:
       args:
         - DEPENDENCY_IMAGE=presto/prestissimo-dependency:ubuntu-22.04
@@ -39,7 +39,7 @@ services:
     # Usage:
     #   docker compose build centos-cpp-dev
     #   podman compose build centos-cpp-dev
-    image: presto/presto-cpp-dev:centos9
+    image: docker.io/presto/presto-cpp-dev:centos9
     build:
       args:
         - DEPENDENCY_IMAGE=presto/prestissimo-dependency:centos9
@@ -62,7 +62,7 @@ services:
     # Usage:
     #   docker compose build ubuntu-java-dev
     #   podman compose build ubuntu-java-dev
-    image: presto/presto-java-dev:ubuntu-22.04
+    image: docker.io/presto/presto-java-dev:ubuntu-22.04
     build:
       context: ..
       args:
@@ -76,7 +76,7 @@ services:
     #   podman compose build centos-dev
     #   docker compose run --rm -it --service-ports centos-dev
     #   podman compose run --rm -it --service-ports centos-dev
-    image: presto/presto-java-dev:centos9
+    image: docker.io/presto/presto-java-dev:centos9
     build:
       args:
         - BASE_IMAGE=presto/presto-cpp-dev:centos9
@@ -90,7 +90,7 @@ services:
     #   podman compose build ubuntu-dev
     #   docker compose run --rm -it --service-ports ubuntu-dev
     #   podman compose run --rm -it --service-ports ubuntu-dev
-    image: presto/presto-dev:ubuntu-22.04
+    image: docker.io/presto/presto-dev:ubuntu-22.04
     build:
       args:
         - BASE_IMAGE=presto/presto-java-dev:ubuntu-22.04
@@ -117,7 +117,7 @@ services:
     #   podman compose build centos-dev
     #   docker compose run --rm -it --service-ports centos-dev
     #   podman compose run --rm -it --service-ports centos-dev
-    image: presto/presto-dev:centos9
+    image: docker.io/presto/presto-dev:centos9
     build:
       args:
         - BASE_IMAGE=presto/presto-java-dev:centos9

@@ -62,9 +62,10 @@ RUN --mount=type=bind,source=.,target=${BUILD_ROOT},rw \
       mkdir -p /opt/cache && \
       rm -rf /opt/cache/.ccache && rm -rf /root/.ccache && \
       cp -r ${CCACHE_DIR} /opt/cache/.ccache && \
-      ln -sf /opt/cache/.ccache /root/.ccache; \
+      ln -sf /opt/cache/.ccache /root/.ccache && \
+      env CCACHE_DIR='' ccache --max-files=4200 -c; \
     fi && \
-    ccache -sz -v
+    ccache -s -v
 
 COPY --chmod=0755 presto-dev/prestissimo/etc $PRESTISSIMO_HOME/etc
 COPY --chmod=0755 presto-dev/prestissimo/entrypoint.sh $PRESTISSIMO_HOME/
