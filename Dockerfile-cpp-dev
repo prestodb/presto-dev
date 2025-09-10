@@ -47,15 +47,19 @@ RUN --mount=type=bind,source=.,target=${BUILD_ROOT},rw \
     fi && \
     cd ${BUILD_ROOT}/presto-native-execution && \
     make release && df -h && \
-    make clean && \
-    make debug && df -h && \
+    export OUT_DIR=release && \
+    if [ "${OSNAME}" != "ubuntu" ]; then \
+      make clean && \
+      make debug && df -h && \
+      export OUT_DIR=debug; \
+    fi && \
     if [ "${CACHE_OPTION}" = "update" ]; then \
       echo "ccache data updated"; \
       make clean; \
     else \
-      !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server  | grep "not found") && \
-      LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " ${PRESTISSIMO_HOME}/lib") }' && \
-      cp ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/debug/presto_cpp/main/presto_server ${PRESTISSIMO_HOME}/bin/presto_server && \
+      !(LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/${OUT_DIR}/presto_cpp/main/presto_server  | grep "not found") && \
+      LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64 ldd ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/${OUT_DIR}/presto_cpp/main/presto_server | awk 'NF == 4 { system("cp " $3 " ${PRESTISSIMO_HOME}/lib") }' && \
+      cp ${BUILD_ROOT}/presto-native-execution/${BUILD_BASE_DIR}/${OUT_DIR}/presto_cpp/main/presto_server ${PRESTISSIMO_HOME}/bin/presto_server && \
       chmod 0755 ${PRESTISSIMO_HOME}/bin/presto_server && \
       echo "${PRESTISSIMO_HOME}/lib" > /etc/ld.so.conf.d/prestissimo.conf && ldconfig && \
       make clean && \
