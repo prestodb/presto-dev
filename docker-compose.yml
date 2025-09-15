@@ -34,6 +34,10 @@ services:
                             -DVELOX_ENABLE_SPARK_FUNCTIONS=ON
       context: ..
       dockerfile: presto-dev/Dockerfile-cpp-dev
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
 
   centos-cpp-dev:
     # Usage:
@@ -57,6 +61,10 @@ services:
                             -DVELOX_ENABLE_SPARK_FUNCTIONS=ON
       context: ..
       dockerfile: presto-dev/Dockerfile-cpp-dev
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
 
   ubuntu-java-dev:
     # Usage:
@@ -69,6 +77,10 @@ services:
         - BASE_IMAGE=presto/presto-cpp-dev:ubuntu-22.04
       dockerfile: presto-dev/Dockerfile-java-dev
       target: ubuntu
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
 
   centos-java-dev:
     # Usage:
@@ -83,6 +95,10 @@ services:
       context: ..
       dockerfile: presto-dev/Dockerfile-java-dev
       target: centos
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
 
   ubuntu-dev:
     # Usage:
@@ -96,6 +112,10 @@ services:
         - BASE_IMAGE=presto/presto-java-dev:ubuntu-22.04
       dockerfile: Dockerfile-tools
       target: ubuntu
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
     stdin_open: true
     tty: true
     volumes:
@@ -123,6 +143,10 @@ services:
         - BASE_IMAGE=presto/presto-java-dev:centos9
       dockerfile: Dockerfile-tools
       target: centos
+      labels:
+        org.opencontainers.image.revision: ${COMMIT_ID}
+        org.opencontainers.image.created: ${TIMESTAMP}
+        org.opencontainers.image.version: ${VERSION}
     stdin_open: true
     tty: true
     volumes:
@@ -137,4 +161,3 @@ services:
     - 7777:7777
     - 2222:2222
     command: /usr/sbin/sshd -D
-

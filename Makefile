@@ -5,6 +5,7 @@ NUM_THREADS ?= 3
 VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
 COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
 TIMESTAMP ?= $(shell date '+%Y%m%d%H%M%S')
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 
 .PHONY: centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-java-dev ubuntu-java-dev \
@@ -32,10 +33,12 @@ ubuntu-dep:
 		$(DOCKER_CMD) compose build ubuntu-native-dependency
 
 centos-cpp-dev:
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) centos-cpp-dev
+	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+		centos-cpp-dev
 
 ubuntu-cpp-dev:
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) ubuntu-cpp-dev
+	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+		ubuntu-cpp-dev
 
 centos-java-dev:
 	$(DOCKER_CMD) compose build centos-java-dev
@@ -54,7 +57,8 @@ centos-update-ccache:
 	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
-		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) centos-cpp-dev
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) \
+		centos-cpp-dev
 	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:centos9 docker.io/presto/presto-dev:centos9
 
 ubuntu-update-ccache:
@@ -62,28 +66,45 @@ ubuntu-update-ccache:
 	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
-		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) ubuntu-cpp-dev
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) \
+		ubuntu-cpp-dev
 	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:ubuntu-22.04 docker.io/presto/presto-cpp-dev:ubuntu-22.04
 
 release-prepare:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh prepare
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) ./scripts/release.sh prepare
 
 release-publish:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh publish
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) ./scripts/release.sh publish
 
 pull-centos:
-	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-centos
-	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-centos docker.io/presto/presto-dev:centos9
+	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-centos-$(ARCH)
+	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-centos-$(ARCH) docker.io/presto/presto-dev:centos9
 
 pull-ubuntu:
-	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-ubuntu
-	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-ubuntu docker.io/presto/presto-dev:ubuntu-22.04
+	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-ubuntu-$(ARCH)
+	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-ubuntu-$(ARCH) docker.io/presto/presto-dev:ubuntu-22.04
 
 latest-centos:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest centos
+	${DOCKER_CMD} manifest rm docker.io/${ORG}/presto-dev:latest-centos 2>/dev/null || true
+	${DOCKER_CMD} manifest create docker.io/${ORG}/presto-dev:latest-centos \
+		docker.io/${ORG}/presto-dev:latest-centos-amd64 \
+		docker.io/${ORG}/presto-dev:latest-centos-arm64
+	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-centos \
+		docker.io/${ORG}/presto-dev:latest-centos-amd64 --os linux --arch amd64
+	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-centos \
+		docker.io/${ORG}/presto-dev:latest-centos-arm64 --os linux --arch arm64
+	${DOCKER_CMD} manifest push docker.io/${ORG}/presto-dev:latest-centos
 
 latest-ubuntu:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ./scripts/release.sh manifest ubuntu
+	${DOCKER_CMD} manifest rm docker.io/${ORG}/presto-dev:latest-ubuntu 2>/dev/null || true
+	${DOCKER_CMD} manifest create docker.io/${ORG}/presto-dev:latest-ubuntu \
+		docker.io/${ORG}/presto-dev:latest-ubuntu-amd64 \
+		docker.io/${ORG}/presto-dev:latest-ubuntu-arm64
+	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-ubuntu \
+		docker.io/${ORG}/presto-dev:latest-ubuntu-amd64 --os linux --arch amd64
+	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-ubuntu \
+		docker.io/${ORG}/presto-dev:latest-ubuntu-arm64 --os linux --arch arm64
+	${DOCKER_CMD} manifest push docker.io/${ORG}/presto-dev:latest-ubuntu
 
 prepare-home:
 	@if [ ! -f "../.vscode/launch.json" ]; then \
