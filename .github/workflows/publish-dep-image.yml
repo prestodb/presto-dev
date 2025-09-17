@@ -1,0 +1,96 @@
+name: Publish Dependency Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      os_type:
+        description: 'Operating System'
+        required: true
+        default: 'centos'
+        type: choice
+        options:
+          - centos
+          - ubuntu
+      architecture:
+        description: 'Architecture'
+        required: true
+        default: 'arm64'
+        type: choice
+        options:
+          - arm64
+          - amd64
+
+env:
+  ORG: ${{ github.repository_owner }}
+  ARCH: ${{ inputs.architecture }}
+  DOCKER_CMD: docker
+  NUM_THREADS: 2
+
+jobs:
+  build-and-push:
+    name: Build and Push Dependency Image
+    runs-on: ${{ inputs.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    
+    steps:
+      - name: Checkout presto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          repository: prestodb/presto
+          path: presto
+
+      - name: Checkout presto-dev
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: presto/presto-dev
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Get version information
+        id: version
+        run: |
+          cd presto
+          VERSION=$(grep -m 1 '^    <version>' pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
+          COMMIT_ID=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date '+%Y%m%d%H%M%S')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_OUTPUT
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_ENV
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          cd presto-native-execution
+          make submodules
+      
+      - name: Build dependency image
+        run: |
+          cd presto/presto-dev
+          make ${{ inputs.os_type }}-dep
+      
+      - name: Tag and push images
+        run: |
+          cd presto/presto-dev
+          
+          # Define image names
+          DEP_IMAGE="docker.io/${{ env.ORG }}/prestissimo-dependency"
+          VERSION_TAG="${DEP_IMAGE}:${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.COMMIT_ID }}-${{ inputs.os_type }}-${{ inputs.architecture }}"
+          LATEST_TAG="${DEP_IMAGE}:latest-${{ inputs.os_type }}-${{ inputs.architecture }}"
+          
+          # Tag with version and latest
+          docker tag "presto/prestissimo-dependency:${{ inputs.os_type == 'ubuntu' && 'ubuntu-22.04' || 'centos9' }}" "${VERSION_TAG}"
+          docker tag "presto/prestissimo-dependency:${{ inputs.os_type == 'ubuntu' && 'ubuntu-22.04' || 'centos9' }}" "${LATEST_TAG}"
+          
+          # Push images
+          docker push "${VERSION_TAG}"
+          docker push "${LATEST_TAG}"
+          
+          echo "Pushed version tag: ${VERSION_TAG}"
+          echo "Pushed latest tag: ${LATEST_TAG}"

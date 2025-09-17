@@ -7,6 +7,7 @@ COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
 TIMESTAMP ?= $(shell date '+%Y%m%d%H%M%S')
 ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
+ARM_BUILD_TARGET ?= apple
 
 .PHONY: centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-java-dev ubuntu-java-dev \
 	centos-dev ubuntu-dev release-prepare release-publish pull-centos pull-ubuntu \
@@ -22,7 +23,7 @@ centos-dep:
 		if [ -f "../presto-dev/$(VELOX_SCRIPT_PATCH)" ]; then \
 			(cd velox && git stash && patch -p1 < "../../presto-dev/$(VELOX_SCRIPT_PATCH)") \
 		fi && \
-		$(DOCKER_CMD) compose build centos-native-dependency
+		$(DOCKER_CMD) compose build --build-arg ARM_BUILD_TARGET=$(ARM_BUILD_TARGET) centos-native-dependency
 
 ubuntu-dep:
 	@cd ../presto-native-execution && \
@@ -30,7 +31,7 @@ ubuntu-dep:
 		if [ -f "../presto-dev/$(VELOX_SCRIPT_PATCH)" ]; then \
 			(cd velox && git stash && patch -p1 < "../../presto-dev/$(VELOX_SCRIPT_PATCH)") \
 		fi && \
-		$(DOCKER_CMD) compose build ubuntu-native-dependency
+		$(DOCKER_CMD) compose build --build-arg ARM_BUILD_TARGET=$(ARM_BUILD_TARGET) ubuntu-native-dependency
 
 centos-cpp-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \

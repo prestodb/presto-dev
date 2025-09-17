@@ -1,0 +1,104 @@
+name: Publish Dev Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      os_type:
+        description: 'Operating System'
+        required: true
+        default: 'centos'
+        type: choice
+        options:
+          - centos
+          - ubuntu
+      architecture:
+        description: 'Architecture'
+        required: true
+        default: 'arm64'
+        type: choice
+        options:
+          - arm64
+          - amd64
+      dep_image:
+        description: 'Dependency Image'
+        required: true
+        type: string
+        default: 'prestodb/prestissimo-dependency:latest-centos-arm64'
+
+env:
+  ORG: ${{ github.repository_owner }}
+  ARCH: ${{ inputs.architecture }}
+  DOCKER_CMD: docker
+  NUM_THREADS: 2
+
+jobs:
+  build-and-push:
+    name: Build and Push Dev Image
+    runs-on: ${{ inputs.architecture == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          docker-images: false
+
+      - name: Checkout presto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          repository: prestodb/presto
+          path: presto
+
+      - name: Checkout presto-dev
+        uses: actions/checkout@v4
+        with:
+          path: presto/presto-dev
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Pull dependency image
+        run: |
+          # Pull the dependency image
+          docker pull ${{ inputs.dep_image }}
+
+          # Tag the image with the expected name based on OS type
+          if [ "${{ inputs.os_type }}" = "centos" ]; then
+            docker tag ${{ inputs.dep_image }} docker.io/presto/prestissimo-dependency:centos9
+          else
+            docker tag ${{ inputs.dep_image }} docker.io/presto/prestissimo-dependency:ubuntu-22.04
+          fi
+
+      - name: Build cpp-dev image
+        run: |
+          cd presto/presto-dev
+          docker images
+          make ${{ inputs.os_type }}-cpp-dev
+
+      - name: Build java-dev image (if needed)
+        run: |
+          cd presto/presto-dev
+          docker images
+          make ${{ inputs.os_type }}-java-dev
+
+      - name: Build dev image (if needed)
+        run: |
+          cd presto/presto-dev
+          docker images
+          make ${{ inputs.os_type }}-dev
+
+      - name: Prepare release
+        run: |
+          cd presto/presto-dev
+          docker images
+          make release-prepare
+
+      - name: Publish release
+        run: |
+          cd presto/presto-dev
+          docker images
+          make release-publish
