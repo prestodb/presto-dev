@@ -33,28 +33,35 @@ ubuntu-dep:
 		$(DOCKER_CMD) compose build ubuntu-native-dependency
 
 centos-cpp-dev:
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		centos-cpp-dev
 
 ubuntu-cpp-dev:
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		ubuntu-cpp-dev
 
 centos-java-dev:
-	$(DOCKER_CMD) compose build centos-java-dev
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build centos-java-dev
 
 ubuntu-java-dev:
-	$(DOCKER_CMD) compose build ubuntu-java-dev
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build ubuntu-java-dev
 
 centos-dev:
-	$(DOCKER_CMD) compose build centos-dev
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build centos-dev
 
 ubuntu-dev:
-	$(DOCKER_CMD) compose build ubuntu-dev
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build ubuntu-dev
 
 centos-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:centos9 docker.io/presto/presto-dev:centos-$(TIMESTAMP)
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
 		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) \
@@ -63,7 +70,8 @@ centos-update-ccache:
 
 ubuntu-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:ubuntu-22.04 docker.io/presto/presto-dev:ubuntu-$(TIMESTAMP)
-	$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
 		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) \
