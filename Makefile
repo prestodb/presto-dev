@@ -132,7 +132,7 @@ start-centos: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-centos; \
 	fi
-	${DOCKER_CMD} compose up centos-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 start-ubuntu: prepare-home
@@ -140,26 +140,26 @@ start-ubuntu: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-ubuntu; \
 	fi
-	${DOCKER_CMD} compose up ubuntu-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 down-centos:
-	${DOCKER_CMD} compose down centos-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose down centos-dev
 
 down-ubuntu:
-	${DOCKER_CMD} compose down ubuntu-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose down ubuntu-dev
 
 stop-centos:
-	${DOCKER_CMD} compose stop centos-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose stop centos-dev
 
 stop-ubuntu:
-	${DOCKER_CMD} compose stop ubuntu-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose stop ubuntu-dev
 
 shell-centos:
-	${DOCKER_CMD} compose exec centos-dev bash
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec centos-dev bash
 
 shell-ubuntu:
-	${DOCKER_CMD} compose exec ubuntu-dev bash
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec ubuntu-dev bash
 
 start: start-centos
 

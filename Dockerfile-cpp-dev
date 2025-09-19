@@ -67,7 +67,7 @@ RUN --mount=type=bind,source=.,target=${BUILD_ROOT},rw \
       rm -rf /opt/cache/.ccache && rm -rf /root/.ccache && \
       cp -r ${CCACHE_DIR} /opt/cache/.ccache && \
       ln -sf /opt/cache/.ccache /root/.ccache && \
-      env CCACHE_DIR='' ccache --max-files=4500 -c; \
+      env CCACHE_DIR='' ccache --max-size=3G -c; \
     fi && \
     ccache -s -v
 

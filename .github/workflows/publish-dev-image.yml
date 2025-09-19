@@ -29,7 +29,7 @@ env:
   ORG: ${{ github.repository_owner }}
   ARCH: ${{ inputs.architecture }}
   DOCKER_CMD: docker
-  NUM_THREADS: 2
+  NUM_THREADS: 1
 
 jobs:
   build-and-push:
