@@ -33,8 +33,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     ssh-keygen -A
 
-RUN rm -rf /opt/presto/plugin/native-sql-invoked-functions-plugin
-
 FROM ${BASE_IMAGE} as centos
 
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
@@ -56,4 +54,3 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     ssh-keygen -A
 
-RUN rm -rf /opt/presto/plugin/native-sql-invoked-functions-plugin
