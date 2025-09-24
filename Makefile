@@ -86,12 +86,12 @@ release-publish:
 	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) ./scripts/release.sh publish
 
 pull-centos:
-	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-centos-$(ARCH)
-	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-centos-$(ARCH) docker.io/presto/presto-dev:centos9
+	$(DOCKER_CMD) pull docker.io/$(ORG)/presto-dev:latest-centos-$(ARCH)
+	$(DOCKER_CMD) tag docker.io/$(ORG)/presto-dev:latest-centos-$(ARCH) docker.io/presto/presto-dev:centos9
 
 pull-ubuntu:
-	$(DOCKER_CMD) pull ${ORG}/presto-dev:latest-ubuntu-$(ARCH)
-	$(DOCKER_CMD) tag ${ORG}/presto-dev:latest-ubuntu-$(ARCH) docker.io/presto/presto-dev:ubuntu-22.04
+	$(DOCKER_CMD) pull docker.io/$(ORG)/presto-dev:latest-ubuntu-$(ARCH)
+	$(DOCKER_CMD) tag docker.io/$(ORG)/presto-dev:latest-ubuntu-$(ARCH) docker.io/presto/presto-dev:ubuntu-22.04
 
 latest-centos:
 	${DOCKER_CMD} manifest rm docker.io/${ORG}/presto-dev:latest-centos 2>/dev/null || true
