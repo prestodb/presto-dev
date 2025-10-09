@@ -1,6 +1,6 @@
 ORG ?= unidevel
 DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
-CLEAN_CACHE ?= false
+CACHE_OPTION ?=
 NUM_THREADS ?= 3
 VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
 COMMIT_ID ?= $(shell git -C .. rev-parse --short HEAD)
@@ -35,12 +35,12 @@ ubuntu-dep:
 
 centos-cpp-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
-		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		centos-cpp-dev
 
 ubuntu-cpp-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
-		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) --build-arg NUM_THREADS=$(NUM_THREADS) \
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		ubuntu-cpp-dev
 
 centos-java-dev:
@@ -62,7 +62,7 @@ ubuntu-dev:
 centos-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:centos9 docker.io/presto/presto-dev:centos-$(TIMESTAMP)
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
-		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
 		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) \
@@ -72,7 +72,7 @@ centos-update-ccache:
 ubuntu-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:ubuntu-22.04 docker.io/presto/presto-dev:ubuntu-$(TIMESTAMP)
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
-		$(DOCKER_CMD) compose build --build-arg CLEAN_CACHE=$(CLEAN_CACHE) \
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
 		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) \
