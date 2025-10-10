@@ -1,0 +1,39 @@
+#!/bin/bash -e
+
+echo "This script will replace symbolic links and update the local cache."
+read -p "Are you sure you want to continue? (yes/no) " -r
+echo
+if [[ ! $REPLY =~ ^[Yy][Ee][Ss]$ ]]
+then
+    echo "Aborted."
+    exit 1
+fi
+
+# Directories to check in the current folder
+DIRECTORIES=(".m2" ".cache" ".ccache")
+BASE_SOURCE_DIR="/opt/cache"
+
+for dir in "$HOME/${DIRECTORIES[@]}"; do
+  if [ -L "$dir" ]; then
+    # Get the target of the symbolic link
+    target=$(readlink "$dir")
+    echo "Found symbolic link $dir -> $target"
+
+    # Remove the symbolic link
+    echo "Removing symbolic link $dir"
+    rm "$dir"
+
+    # Create the directory
+    echo "Creating directory $dir"
+    mkdir -p "$dir"
+
+    # Copy the content from the target to the new directory
+    echo "Copying content from $target to $dir"
+    cp -rT "$target" "$dir"
+    echo "Successfully updated $dir from symlink target"
+  else
+    echo "$dir is not a symbolic link, skipping."
+  fi
+done
+
+echo "Cache update process finished."

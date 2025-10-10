@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+echo "Building presto"
+cd /presto
+./mvnw clean install -DskipTests
+
+echo "Installing presto"
+cd /opt/presto
+tar --strip-components=1 -xzf /presto/presto-server/target/presto-server-*.tar.gz -C .
+
+echo "Building prestissimo"
+cd /presto/presto-native-execution
+make debug
+
+echo "Installing prestissimo"
+cp /presto/presto-native-execution/_build/debug/presto_cpp/main/presto_server /opt/prestissimo/bin/presto_server
