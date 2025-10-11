@@ -1,4 +1,4 @@
-ORG ?= unidevel
+ORG ?= $(shell git remote get-url origin | sed -E 's|.*[:/]([^/]+)/[^/]+(\.git)?$$|\1|')
 DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
 CACHE_OPTION ?=
 NUM_THREADS ?= 3
@@ -132,7 +132,7 @@ start-centos: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-centos; \
 	fi
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose up centos-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 start-ubuntu: prepare-home
@@ -140,7 +140,7 @@ start-ubuntu: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-ubuntu; \
 	fi
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose up ubuntu-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 down-centos:
@@ -155,10 +155,10 @@ stop-centos:
 stop-ubuntu:
 	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose stop ubuntu-dev
 
-shell-centos:
+shell-centos: start-centos
 	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec centos-dev bash
 
-shell-ubuntu:
+shell-ubuntu: start-ubuntu
 	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec ubuntu-dev bash
 
 start: start-centos
