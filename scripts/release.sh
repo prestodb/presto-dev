@@ -10,6 +10,8 @@ fi
 
 # Default organization if not set
 ORG=${ORG:-"prestodb"}
+# Default docker registry if not set
+DOCKERHUB=${DOCKERHUB:-"ghcr.io"}
 
 # --- Get Version ---
 POM_PATH="../pom.xml"
@@ -45,8 +47,8 @@ IMAGES_TO_PROCESS=(
 
 for IMAGE_INFO in "${IMAGES_TO_PROCESS[@]}"; do
   read -r OLD_IMAGE OS <<<"$IMAGE_INFO"
-  NEW_TAG="docker.io/${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${OS}-${ARCH}"
-  LATEST_TAG="docker.io/${ORG}/presto-dev:latest-${OS}-${ARCH}"
+  NEW_TAG="${DOCKERHUB}/${ORG}/presto-dev:${VERSION}-${COMMIT_ID}-${OS}-${ARCH}"
+  LATEST_TAG="${DOCKERHUB}/${ORG}/presto-dev:latest-${OS}-${ARCH}"
 
   if [ "$MODE" = "prepare" ]; then
     echo "Tagging ${OLD_IMAGE} as ${NEW_TAG}"

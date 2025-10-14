@@ -85,8 +85,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 FROM ${BASE_IMAGE} as centos
 
-ENV PYTHON_VERSION=3.11.9 \
-    JAVA_HOME=/usr/lib/jvm/jre-17-openjdk \
+ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk \
     PRESTO_HOME=/opt/presto \
     JMX_PROMETHEUS_JAVAAGENT_VERSION=0.20.0 \
     BUILD_ROOT=/presto
@@ -95,19 +94,13 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/usr/local/src,sharing=locked \
     --mount=from=builder,source=/opt,target=/builder/opt \
     echo "keepcache=1" >> /etc/dnf/dnf.conf && \
-    dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
-    cd /usr/local/src && \
-    wget -c https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
-    tar xvf Python-${PYTHON_VERSION}.tgz && \
-    cd Python-${PYTHON_VERSION} && \
-    ./configure --enable-optimizations && \
-    make -j$(nproc) && \
-    make altinstall && \
-    alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1 && \
-    alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.11 1 && \
+    dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb \
+        dnf-plugins-core epel-release && \
+    dnf install -y python3.11 python3.11-pip && \
+    alternatives --install /usr/bin/python python /usr/bin/python3.11 1 && \
+    alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install cmake && \
-    rm -rf Python-${PYTHON_VERSION} && \
     mkdir -p /opt/cache && \
     mkdir -p $PRESTO_HOME && \
     cp -a /builder${PRESTO_HOME}/* $PRESTO_HOME/ && \

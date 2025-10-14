@@ -1,5 +1,6 @@
 ORG ?= $(shell git remote get-url origin | sed -E 's|.*[:/]([^/]+)/[^/]+(\.git)?$$|\1|')
 DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
+DOCKERHUB ?= docker.io
 CACHE_OPTION ?=
 NUM_THREADS ?= 3
 VERSION ?= $(shell grep -m 1 '^    <version>' ../pom.xml | sed -e 's/.*<version>\([^<]*\)<\/version>.*/\1/' -e 's/-SNAPSHOT//')
@@ -80,40 +81,18 @@ ubuntu-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:ubuntu-22.04 docker.io/presto/presto-cpp-dev:ubuntu-22.04
 
 release-prepare:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) ./scripts/release.sh prepare
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) DOCKERHUB=$(DOCKERHUB) ./scripts/release.sh prepare
 
 release-publish:
-	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) ./scripts/release.sh publish
+	ORG=$(ORG) DOCKER_CMD=$(DOCKER_CMD) ARCH=$(ARCH) DOCKERHUB=$(DOCKERHUB) ./scripts/release.sh publish
 
 pull-centos:
-	$(DOCKER_CMD) pull docker.io/$(ORG)/presto-dev:latest-centos-$(ARCH)
-	$(DOCKER_CMD) tag docker.io/$(ORG)/presto-dev:latest-centos-$(ARCH) docker.io/presto/presto-dev:centos9
+	$(DOCKER_CMD) pull $(DOCKERHUB)/$(ORG)/presto-dev:latest-centos-$(ARCH)
+	$(DOCKER_CMD) tag $(DOCKERHUB)/$(ORG)/presto-dev:latest-centos-$(ARCH) docker.io/presto/presto-dev:centos9
 
 pull-ubuntu:
-	$(DOCKER_CMD) pull docker.io/$(ORG)/presto-dev:latest-ubuntu-$(ARCH)
-	$(DOCKER_CMD) tag docker.io/$(ORG)/presto-dev:latest-ubuntu-$(ARCH) docker.io/presto/presto-dev:ubuntu-22.04
-
-latest-centos:
-	${DOCKER_CMD} manifest rm docker.io/${ORG}/presto-dev:latest-centos 2>/dev/null || true
-	${DOCKER_CMD} manifest create docker.io/${ORG}/presto-dev:latest-centos \
-		docker.io/${ORG}/presto-dev:latest-centos-amd64 \
-		docker.io/${ORG}/presto-dev:latest-centos-arm64
-	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-centos \
-		docker.io/${ORG}/presto-dev:latest-centos-amd64 --os linux --arch amd64
-	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-centos \
-		docker.io/${ORG}/presto-dev:latest-centos-arm64 --os linux --arch arm64
-	${DOCKER_CMD} manifest push docker.io/${ORG}/presto-dev:latest-centos
-
-latest-ubuntu:
-	${DOCKER_CMD} manifest rm docker.io/${ORG}/presto-dev:latest-ubuntu 2>/dev/null || true
-	${DOCKER_CMD} manifest create docker.io/${ORG}/presto-dev:latest-ubuntu \
-		docker.io/${ORG}/presto-dev:latest-ubuntu-amd64 \
-		docker.io/${ORG}/presto-dev:latest-ubuntu-arm64
-	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-ubuntu \
-		docker.io/${ORG}/presto-dev:latest-ubuntu-amd64 --os linux --arch amd64
-	${DOCKER_CMD} manifest annotate docker.io/${ORG}/presto-dev:latest-ubuntu \
-		docker.io/${ORG}/presto-dev:latest-ubuntu-arm64 --os linux --arch arm64
-	${DOCKER_CMD} manifest push docker.io/${ORG}/presto-dev:latest-ubuntu
+	$(DOCKER_CMD) pull $(DOCKERHUB)/$(ORG)/presto-dev:latest-ubuntu-$(ARCH)
+	$(DOCKER_CMD) tag $(DOCKERHUB)/$(ORG)/presto-dev:latest-ubuntu-$(ARCH) docker.io/presto/presto-dev:ubuntu-22.04
 
 prepare-home:
 	@if [ ! -f "../.vscode/launch.json" ]; then \
