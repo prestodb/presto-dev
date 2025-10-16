@@ -19,7 +19,7 @@ Run the following command to clone the `presto-dev` repository into your local `
 
 ```sh
 # Inside your local presto directory
-git clone https://github.com/unidevel/presto-dev.git
+git clone https://github.com/prestodb/presto-dev.git
 
 # Start the dev container and enter container shell
 cd presto-dev
@@ -94,7 +94,7 @@ You can modify the existing configuration files in these profiles or create a ne
 3. Modify the configuration files as needed
 4. Create a `start-cluster` script for your profile
 
-The [presto/data](https://github.com/unidevel/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data` to persist data between container restarts.
+The [presto/data](https://github.com/prestodb/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data` to persist data between container restarts.
 
 This approach allows you to maintain multiple configuration profiles and easily switch between them using the `start-cluster` script.
 
@@ -103,7 +103,7 @@ This approach allows you to maintain multiple configuration profiles and easily 
 1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension.
 2. Open `Remote Explorer` panel, switch to `Dev Containers` from the drop down widget on the top.
 3. Open the `/presto` directory in the composed container `presto-dev` (If importing Maven projects takes a long time, run `./mvnw clean` in the `/presto` directory and `make clean` in the `/presto/presto-native-execution` directory inside the container.).
-4. If `presto/.vscode/launch.json` is not already configured, the file [launch.json](https://github.com/unidevel/presto-dev/tree/main/launch.json) is copied there automatically. If it is already configured, append the contents of [launch.json](https://github.com/unidevel/presto-dev/tree/main/launch.json) from this repository to your existing `presto/.vscode/launch.json`.
+4. If `presto/.vscode/launch.json` is not already configured, the file [launch.json](https://github.com/prestodb/presto-dev/tree/main/launch.json) is copied there automatically. If it is already configured, append the contents of [launch.json](https://github.com/prestodb/presto-dev/tree/main/launch.json) from this repository to your existing `presto/.vscode/launch.json`.
 5. Install Microsoft [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) and [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) in the container.
 6. Start Presto & Prestissimo in the container.
 7. After the Java projects are imported, open the Debug panel and select either `Attach to Prestissimo` or `Attach to Presto` to start debugging.
