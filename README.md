@@ -16,7 +16,7 @@ Run the following command to clone the `presto-dev` repository into your local `
 # Inside your local presto directory
 git clone https://github.com/unidevel/presto-dev.git
 
-# Start the docker container and enter shell
+# Start the dev container and enter shell
 cd presto-dev
 make
 ```
@@ -37,13 +37,14 @@ All the commands below must be executed inside the container shell.
 ```sh
 ls -la /root
 
-# Start presto coordinator
-cd /opt/presto
-nohup ./entrypoint.sh &
+# Start presto coordinator and prestissimo worker
+start-cluster default
 
-# Start prestissimo worker
-cd /opt/prestissimo
-nohup ./entrypoint.sh &
+# Start presto single node and prestissimo sidecar
+start-cluster sidecar
+
+# Stop cluster
+stop-cluster
 
 # Build presto (.m2 already cached)
 cd /presto
@@ -58,15 +59,24 @@ Use http://localhost:8080 to open the Presto console.
 
 ## Update Presto or Prestissimo configuration
 
-The configuration files are in the [presto/etc](https://github.com/unidevel/presto-dev/tree/main/presto/etc) and [prestissimo/etc](https://github.com/unidevel/presto-dev/tree/main/prestissimo/etc) directories.
+The configuration files are organized within cluster profiles in the `clusters/` directory. Each cluster profile contains its own configuration files for Presto coordinator, Presto worker, and/or Prestissimo worker.
 
-In the container, they are mounted as `/opt/presto/etc` and `/opt/prestissimo/etc` respectively.
+Available cluster profiles:
+- `presto`: Presto coordinator and worker
+- `prestissimo`: Presto coordinator and Prestissimo worker
+- `presto-single`: Single node Presto server
+- `sidecar`: Presto coordinator with worker and Prestissimo worker with sidecar configuration
 
-You can add more catalogs or update the configuration files.
+You can modify the existing configuration files in these profiles or create a new cluster profile based on your specific requirements. To create a new cluster profile:
 
-The [presto/data](https://github.com/unidevel/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data`.
+1. Create a new directory under `clusters/` with your profile name
+2. Copy the configuration files from an existing profile
+3. Modify the configuration files as needed
+4. Create a `start-cluster` script for your profile
 
-In this way, you can update and keep them locally in case the container is deleted.
+The [presto/data](https://github.com/unidevel/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data` to persist data between container restarts.
+
+This approach allows you to maintain multiple configuration profiles and easily switch between them using the `start-cluster` script.
 
 ## Dev with dev container(VSCode)
 
@@ -100,18 +110,81 @@ Host presto-dev
 
 By default, the `root` directory in this repo will be mounted to `/root` in the container. Use this `root` directory to share your data between your local machine and the container.
 
-To keep `ccache`, `m2`, and other cache files locally, run the following commands after starting the shell for the first time. This will copy the cache files into your local root folder.
+By default, the `.ccache`, `.m2`, and `.cache` directories under `/root` directory are symbolic links to the image's `/opt/cache` directories. These symbolic links will disappear when the container is shut down. To preserve your cache data between container restarts, you need to replace these symbolic links with local directories in the mounted `/root` directory.
+
+Run the following command in the shell of dev container:
 
 ```sh
-ls -la /root
-
-rm -f /root/.ccache
-cp -a /opt/cache/.ccache /root/.ccache
-
-rm -f /root/.m2
-cp -a /opt/cache/.m2 /root/.m2
-
-rm -f /root/.cache
-cp -a /opt/cache/.cache /root/.cache
+use-local-cache
 ```
 
+This script replaces the symbolic links with actual directories in your local `/root` folder, copying the cache data from `/opt/cache`. Since the `root` directory is mounted into the container, these cache files will be preserved even when the container is removed, significantly improving build performance on subsequent runs.
+
+## Development Scripts
+
+The development environment includes scripts to help with building and installing Presto and Prestissimo.
+
+### 1. Building and installing script
+
+**build-and-install**: Builds Presto and Prestissimo from source and installs them into `/opt/presto` and `/opt/prestissimo` respectively.
+
+#### Usage
+
+```sh
+build-and-install
+```
+
+This script:
+1. Builds Presto from source in `/presto`
+2. Builds Prestissimo from source in `/presto/presto-native-execution`
+3. Installs the built binaries to `/opt/presto` and `/opt/prestissimo`
+4. Makes the newly built versions available for use
+
+After running this script, you can start the servers with the newly built versions using the cluster management scripts.
+
+### 2. Cluster Management Scripts
+
+The development environment includes scripts to easily start and stop Presto and Prestissimo clusters. These scripts are located in the `/root/bin` directory.
+
+#### Available Scripts
+
+- **start-cluster**: Starts a specific cluster profile (presto, prestissimo, presto-single, or sidecar)
+- **stop-cluster**: Stops all running Presto and Prestissimo servers across all cluster profiles
+
+#### Usage
+
+##### Starting a Cluster
+
+```sh
+start-cluster <cluster-profile>
+```
+
+Where `<cluster-profile>` is one of the available cluster profiles in the `/opt/clusters` directory (e.g., presto, prestissimo, presto-single, sidecar).
+
+Example:
+```sh
+# Start the presto-single cluster
+start-cluster presto-single
+
+# Start the prestissimo cluster
+start-cluster prestissimo
+```
+
+##### Stopping All Clusters
+
+```sh
+stop-cluster
+```
+
+This command will stop all running Presto and Prestissimo servers across all cluster profiles.
+
+#### Cluster Profiles
+
+Each cluster profile has its own configuration and behavior:
+
+- **presto**: Starts a Presto coordinator and a Presto worker
+- **prestissimo**: Starts a Presto coordinator and a Prestissimo worker
+- **presto-single**: Starts a single node Presto server (coordinator with worker)
+- **sidecar**: Starts a single node Presto coordinator with worker and a Prestissimo worker with sidecar configuration
+
+The logs for Presto servers are available at `/opt/presto/data/var/log/server.log`, and the logs for Prestissimo servers are available at `/opt/prestissimo/logs/server.log`.

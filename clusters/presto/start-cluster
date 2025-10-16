@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Script to start Presto coordinator and worker for the presto cluster
+
+# Create logs directory if it doesn't exist
+mkdir -p /opt/presto/logs
+mkdir -p /opt/presto/worker
+
+CLUSTER_DIR=$(dirname $0)
+
+# Start Presto coordinator
+echo "Starting Presto coordinator..."
+COORDINATOR_OUTPUT=$(/opt/presto/bin/launcher start --etc-dir=${CLUSTER_DIR}/etc-coordinator --server-log-file=/opt/presto/logs/server.log 2>&1)
+echo "$COORDINATOR_OUTPUT"
+
+# Extract PID from launcher output (format: "Started as 319")
+COORDINATOR_PID=$(echo "$COORDINATOR_OUTPUT" | grep -oP "Started as \K[0-9]+")
+if [ -n "$COORDINATOR_PID" ]; then
+    echo $COORDINATOR_PID > ${CLUSTER_DIR}/presto.pid
+    echo "Presto coordinator started with PID: $COORDINATOR_PID"
+else
+    echo "Failed to extract Presto coordinator PID from output"
+    exit 1
+fi
+
+# Wait a bit for coordinator to initialize
+sleep 5
+
+# Start Presto worker
+echo "Starting Presto worker..."
+WORKER_OUTPUT=$(/opt/presto/bin/launcher start --etc-dir=${CLUSTER_DIR}/etc-worker --server-log-file=/opt/presto/logs/worker.log 2>&1)
+echo "$WORKER_OUTPUT"
+
+# Extract PID from launcher output (format: "Started as 319")
+WORKER_PID=$(echo "$WORKER_OUTPUT" | grep -oP "Started as \K[0-9]+")
+if [ -n "$WORKER_PID" ]; then
+    echo $WORKER_PID > ${CLUSTER_DIR}/presto-worker.pid
+    echo "Presto worker started with PID: $WORKER_PID"
+else
+    echo "Failed to extract Presto worker PID from output"
+    exit 1
+fi
+
+echo "Cluster started successfully"
+echo "Presto coordinator: http://localhost:8080"
+echo "Presto coordinator logs: /opt/presto/logs/server.log"
+echo "Presto worker logs: /opt/presto/logs/worker.log"

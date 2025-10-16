@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Check if cluster profile is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <cluster profile>"
+    echo "Available cluster profiles:"
+    ls -1 /opt/clusters/
+    exit 1
+fi
+
+CLUSTER_PROFILE=$1
+CLUSTER_DIR="/opt/clusters/$CLUSTER_PROFILE"
+
+# Check if the cluster profile exists
+if [ ! -d "$CLUSTER_DIR" ]; then
+    echo "Error: Cluster profile '$CLUSTER_PROFILE' not found in clusters directory"
+    echo "Available cluster profiles:"
+    ls -1 /opt/clusters/
+    exit 1
+fi
+
+# Check if the cluster has a start-cluster script
+if [ ! -f "$CLUSTER_DIR/start-cluster" ]; then
+    echo "Error: No start-cluster script found for cluster profile '$CLUSTER_PROFILE'"
+    exit 1
+fi
+
+# Execute the cluster-specific start-cluster script
+echo "Starting cluster: $CLUSTER_PROFILE"
+$CLUSTER_DIR/start-cluster
+
+echo "Cluster '$CLUSTER_PROFILE' started successfully"

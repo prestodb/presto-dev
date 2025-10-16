@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Function to stop a server using its PID file
+stop_server() {
+    local pid_file=$1
+    local server_name=$2
+    
+    if [ -f "$pid_file" ]; then
+        pid=$(cat "$pid_file")
+        if ps -p "$pid" > /dev/null; then
+            echo "Stopping $server_name (PID: $pid)..."
+            kill "$pid"
+            # Wait for process to terminate
+            for i in {1..10}; do
+                if ! ps -p "$pid" > /dev/null; then
+                    break
+                fi
+                sleep 1
+            done
+            
+            # Force kill if still running
+            if ps -p "$pid" > /dev/null; then
+                echo "$server_name is still running, force killing..."
+                kill -9 "$pid"
+            fi
+            
+            echo "$server_name stopped"
+        else
+            echo "$server_name is not running (stale PID file)"
+        fi
+        rm -f "$pid_file"
+    else
+        echo "No PID file found for $server_name"
+    fi
+}
+
+echo "Stopping all Presto and Prestissimo servers..."
+
+# Find and stop all running servers across all cluster profiles
+for cluster_dir in /opt/clusters/*/; do
+    cluster_name=$(basename "$cluster_dir")
+    echo "Checking cluster: $cluster_name"
+    
+    # Stop Presto server
+    presto_pid_file="$cluster_dir/presto.pid"
+    stop_server "$presto_pid_file" "Presto server ($cluster_name)"
+    
+    # Stop Prestissimo server
+    prestissimo_pid_file="$cluster_dir/prestissimo.pid"
+    stop_server "$prestissimo_pid_file" "Prestissimo server ($cluster_name)"
+done
+
+echo "All servers stopped"

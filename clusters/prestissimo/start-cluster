@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Script to start Presto and Prestissimo servers for the prestissimo cluster
+
+# Create logs directories if they don't exist
+mkdir -p /opt/presto/logs
+mkdir -p /opt/prestissimo/logs
+
+CLUSTER_DIR=$(dirname $0)
+
+# Start Presto coordinator
+echo "Starting Presto coordinator..."
+PRESTO_OUTPUT=$(/opt/presto/bin/launcher start --etc-dir=${CLUSTER_DIR}/etc-coordinator --server-log-file=/opt/presto/logs/server.log 2>&1)
+
+# Extract PID from launcher output (format: "Started as 319")
+PRESTO_PID=$(echo "$PRESTO_OUTPUT" | grep -oP "Started as \K[0-9]+")
+if [ -n "$PRESTO_PID" ]; then
+    echo $PRESTO_PID > ${CLUSTER_DIR}/presto.pid
+    echo "Presto coordinator started with PID: $PRESTO_PID"
+else
+    echo "Failed to extract Presto PID from output"
+    exit 1
+fi
+
+# Wait a bit for coordinator to initialize
+sleep 5
+
+# Start Prestissimo worker
+echo "Starting Prestissimo worker..."
+GLOG_logtostderr=1 nohup /opt/prestissimo/bin/presto_server --etc-dir=${CLUSTER_DIR}/etc-worker > /opt/prestissimo/logs/server.log 2>&1 &
+PRESTISSIMO_PID=$!
+echo $PRESTISSIMO_PID > ${CLUSTER_DIR}/prestissimo.pid
+echo "Prestissimo worker started with PID: $PRESTISSIMO_PID"
+
+echo "Cluster started successfully"
+echo "Presto coordinator: http://localhost:8080"
+echo "Presto coordinator logs: /opt/presto/log/server.log"
+echo "Prestissimo worker logs: /opt/prestissimo/logs/server.log"
