@@ -1,6 +1,11 @@
 # Presto/Prestissimo Dev Container
 
-* https://hub.docker.com/r/unidevel/presto-dev
+With this dev container, you can:
+* Build Presto and Prestissimo from source
+* Run Presto and Prestissimo with different configurations
+* Debugging with VS Code or any IDE with ssh support
+* Working on UI development
+* Develop unit tests with test containers
 
 ## Prerequisites
 
@@ -10,15 +15,38 @@
 
 This environment can be run on both Linux and macOS.
 
-Run the following command to clone the `presto-dev` repository into your local `presto` directory and start the development environment.
+Run the following command to clone the `presto-dev` repository into your local `presto` directory, start the dev container and enter the container shell.
 
 ```sh
 # Inside your local presto directory
 git clone https://github.com/unidevel/presto-dev.git
 
-# Start the dev container and enter shell
+# Start the dev container and enter container shell
 cd presto-dev
 make
+```
+
+In the dev container shell, you can run the following commands to work with source code.
+
+```sh
+# Build presto (.m2 already cached)
+cd /presto
+./mvnw clean install -DskipTests
+
+# Run unit tests with test container
+start-podman
+cd /presto
+./mvnw test -pl presto-main -Dtest="com/facebook/presto/server/security/oauth2/**"
+
+# Build prestissimo(make debug or make release)
+cd /presto/presto-native-execution
+make
+
+# Start presto-ui development server, open http://localhost:8081 in your browser
+# Run "start-cluster <cluster profile>" first to start a presto cluster
+cd /presto/presto-ui/src
+yarn install
+yarn serve
 ```
 
 When a new `presto-dev` image is published, run the following command to pull the latest version.
@@ -45,14 +73,6 @@ start-cluster sidecar
 
 # Stop cluster
 stop-cluster
-
-# Build presto (.m2 already cached)
-cd /presto
-./mvnw clean install -DskipTests
-
-# Build prestissimo(make debug or make release)
-cd /presto/presto-native-execution
-make
 ```
 
 Use http://localhost:8080 to open the Presto console.
@@ -126,7 +146,9 @@ The development environment includes scripts to help with building and installin
 
 ### 1. Building and installing script
 
-**build-and-install**: Builds Presto and Prestissimo from source and installs them into `/opt/presto` and `/opt/prestissimo` respectively.
+#### Available Scripts
+
+- **build-and-install**: Builds Presto and Prestissimo from source and installs them into `/opt/presto` and `/opt/prestissimo` respectively.
 
 #### Usage
 
@@ -142,7 +164,32 @@ This script:
 
 After running this script, you can start the servers with the newly built versions using the cluster management scripts.
 
-### 2. Cluster Management Scripts
+### 2. Podman Container Scripts
+
+The development environment includes scripts to manage Podman containers for testing. Currently it only supports centos based dev container.
+
+#### Available Scripts
+
+- **start-podman**: Starts rootful podman with sock file `unix:///var/run/docker.sock` to enable running test containers inside the dev container.
+- **stop-podman**: Stops the podman service.
+
+#### Usage
+
+```sh
+# Start podman service
+start-podman
+
+# Run your tests that use test containers
+cd /presto
+./mvnw test -pl presto-main -Dtest="com/facebook/presto/server/security/oauth2/**"
+
+# Stop podman service when done
+stop-podman
+```
+
+The `start-podman` script enables running test containers inside the dev container by providing a Docker-compatible socket at `unix:///var/run/docker.sock`. This allows test frameworks like TestContainers to work properly within the development environment.
+
+### 3. Cluster Management Scripts
 
 The development environment includes scripts to easily start and stop Presto and Prestissimo clusters. These scripts are located in the `/root/bin` directory.
 

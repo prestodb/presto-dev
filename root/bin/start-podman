@@ -1,0 +1,22 @@
+#!/bin/bash -e
+# Start Podman in Docker-compatible mode and log into Docker Hub
+
+echo "Starting Podman Docker-compatible service..."
+
+if pgrep -f "podman system service" >/dev/null; then
+    echo "Podman service is already running. Skipping start."
+else
+    podman system service --time=0 unix:///var/run/docker.sock &
+    sleep 1
+    echo "Podman service started at unix:///var/run/docker.sock"
+fi
+
+if [ -S /var/run/docker.sock ]; then
+    echo "Docker-compatible socket available at /var/run/docker.sock"
+else
+    echo "Error: Docker socket not found. Podman service may not have started correctly."
+    exit 1
+fi
+
+echo "Logging into Docker Hub..."
+podman login docker.io

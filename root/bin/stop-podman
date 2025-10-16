@@ -1,0 +1,2 @@
+#!/bin/bash -e
+pkill -f "podman system service"
