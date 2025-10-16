@@ -9,10 +9,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-version: "3.9"
 
 # Add options to run podman in docker/podman
-# Note: currently run podman in ubuntu is not working, still investigating
 services:
   ubuntu-dev:
     privileged: true

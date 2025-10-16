@@ -1,4 +1,4 @@
-# Presto Docker development environment
+# Presto/Prestissimo Dev Container
 
 * https://hub.docker.com/r/unidevel/presto-dev
 
@@ -16,12 +16,9 @@ Run the following command to clone the `presto-dev` repository into your local `
 # Inside your local presto directory
 git clone https://github.com/unidevel/presto-dev.git
 
-# Start the docker container
+# Start the docker container and enter shell
 cd presto-dev
-make start
-
-# Enter shell
-make shell
+make
 ```
 
 When a new `presto-dev` image is published, run the following command to pull the latest version.
@@ -33,9 +30,9 @@ make pull
 
 ## Start Presto & Prestissimo server
 
-Run `make shell` in the presto-dev directory to open a new container shell. 
+Run `make` or `make shell` in the presto-dev directory to open a new container shell.
 
-All the commands below must be executed inside the container shell. 
+All the commands below must be executed inside the container shell.
 
 ```sh
 ls -la /root

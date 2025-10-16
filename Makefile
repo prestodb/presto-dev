@@ -1,4 +1,5 @@
 ORG ?= $(shell git remote get-url origin | sed -E 's|.*[:/]([^/]+)/[^/]+(\.git)?$$|\1|')
+DESCRIPTION ?= "Presto/Prestissimo Dev Container"
 DOCKER_CMD ?= $(shell if podman info > /dev/null 2>&1; then echo podman; else echo docker; fi)
 DOCKERHUB ?= docker.io
 CACHE_OPTION ?=
@@ -35,48 +36,48 @@ ubuntu-dep:
 		$(DOCKER_CMD) compose build --build-arg ARM_BUILD_TARGET=$(ARM_BUILD_TARGET) ubuntu-native-dependency
 
 centos-cpp-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		centos-cpp-dev
 
 ubuntu-cpp-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) --build-arg NUM_THREADS=$(NUM_THREADS) \
 		ubuntu-cpp-dev
 
 centos-java-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build centos-java-dev
 
 ubuntu-java-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build ubuntu-java-dev
 
 centos-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build centos-dev
 
 ubuntu-dev:
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build ubuntu-dev
 
 centos-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:centos9 docker.io/presto/presto-dev:centos-$(TIMESTAMP)
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
-		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) \
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:centos-$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		centos-cpp-dev
 	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:centos9 docker.io/presto/presto-dev:centos9
 
 ubuntu-update-ccache:
 	$(DOCKER_CMD) tag docker.io/presto/presto-dev:ubuntu-22.04 docker.io/presto/presto-dev:ubuntu-$(TIMESTAMP)
-	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) \
+	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) \
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg CACHE_OPTION=update \
-		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) \
+		--build-arg DEPENDENCY_IMAGE=presto/presto-dev:ubuntu-$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
 		ubuntu-cpp-dev
 	$(DOCKER_CMD) tag docker.io/presto/presto-cpp-dev:ubuntu-22.04 docker.io/presto/presto-cpp-dev:ubuntu-22.04
 
@@ -111,7 +112,8 @@ start-centos: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-centos; \
 	fi
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up centos-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up centos-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 start-ubuntu: prepare-home
@@ -119,26 +121,33 @@ start-ubuntu: prepare-home
 		echo "Image not found locally. Pulling..."; \
 		make pull-ubuntu; \
 	fi
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up ubuntu-dev -d
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose -f docker-compose.yml -f docker-compose.rootful.yml up ubuntu-dev -d
 	${DOCKER_CMD} ps | grep presto-dev
 
 down-centos:
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose down centos-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose down centos-dev
 
 down-ubuntu:
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose down ubuntu-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose down ubuntu-dev
 
 stop-centos:
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose stop centos-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose stop centos-dev
 
 stop-ubuntu:
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose stop ubuntu-dev
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose stop ubuntu-dev
 
 shell-centos: start-centos
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec centos-dev bash
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose exec centos-dev bash
 
 shell-ubuntu: start-ubuntu
-	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) ${DOCKER_CMD} compose exec ubuntu-dev bash
+	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
+		${DOCKER_CMD} compose exec ubuntu-dev bash
 
 start: start-centos
 

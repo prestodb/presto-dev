@@ -38,6 +38,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
 
   centos-cpp-dev:
     # Usage:
@@ -65,6 +67,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
 
   ubuntu-java-dev:
     # Usage:
@@ -81,6 +85,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
 
   centos-java-dev:
     # Usage:
@@ -99,6 +105,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
 
   ubuntu-dev:
     # Usage:
@@ -116,6 +124,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
     stdin_open: true
     tty: true
     volumes:
@@ -147,6 +157,8 @@ services:
         org.opencontainers.image.revision: ${COMMIT_ID}
         org.opencontainers.image.created: ${TIMESTAMP}
         org.opencontainers.image.version: ${VERSION}
+        org.opencontainers.image.description: ${DESCRIPTION}
+        org.opencontainers.image.licenses: Apache-2.0
     stdin_open: true
     tty: true
     volumes:
