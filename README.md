@@ -233,5 +233,6 @@ Each cluster profile has its own configuration and behavior:
 - **prestissimo**: Starts a Presto coordinator and a Prestissimo worker
 - **presto-single**: Starts a single node Presto server (coordinator with worker)
 - **sidecar**: Starts a single node Presto coordinator with worker and a Prestissimo worker with sidecar configuration
+- **router**: Starts a Presto router and a single node Presto server
 
-The logs for Presto servers are available at `/opt/presto/data/var/log/server.log`, and the logs for Prestissimo servers are available at `/opt/prestissimo/logs/server.log`.
+The logs for Presto servers are available at `/opt/presto/data/var/log/server.log`, the logs for Prestissimo servers are available at `/opt/prestissimo/logs/server.log`, and the logs for Presto router are available at `/opt/router/logs/server.log`.

@@ -20,6 +20,13 @@ services:
       - label=disable
     volumes:
       - /dev/fuse:/dev/fuse
+    tmpfs:
+      - /run
+      - /run/lock
+    environment:
+      - _CONTAINERS_USERNS_CONFIGURED=1
+      - DEBIAN_FRONTEND=noninteractive
+    command: /sbin/init
 
   centos-dev:
     privileged: true

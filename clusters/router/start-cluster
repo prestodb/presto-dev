@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Script to start a single Presto server along with the router
+
+# Create logs directory if it doesn't exist
+mkdir -p /opt/router/logs
+
+CLUSTER_DIR=$(dirname $0)
+${CLUSTER_DIR}/../presto-single/start-cluster presto-single
+
+# Start Presto router
+echo "Starting Presto router..."
+PRESTO_OUTPUT=$(/opt/router/bin/launcher start --etc-dir=${CLUSTER_DIR}/etc --server-log-file=/opt/router/logs/server.log 2>&1)
+
+# Extract PID from launcher output (format: "Started as 319")
+PRESTO_PID=$(echo "$PRESTO_OUTPUT" | grep -oP "Started as \K[0-9]+")
+if [ -n "$PRESTO_PID" ]; then
+    echo $PRESTO_PID > ${CLUSTER_DIR}/presto.pid
+    echo "Presto router started with PID: $PRESTO_PID"
+else
+    echo "Failed to extract Presto router PID from output"
+    exit 1
+fi
+
+# Wait a bit for coordinator to initialize
+sleep 5
+
+echo "Router started successfully"
+echo "Presto router: http://localhost:8090"
+echo "Presto router logs: /opt/router/logs/server.log"

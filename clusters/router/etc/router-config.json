@@ -1,0 +1,17 @@
+{
+    "groups": [
+      {
+        "name": "all",
+        "members": [
+            "http://localhost:8080"
+        ],
+        "weights": [1]
+      }
+    ],
+    "selectors": [
+      {
+        "targetGroup": "all"
+      }
+    ],
+    "scheduler": "ROUND_ROBIN"
+}
