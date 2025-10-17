@@ -45,7 +45,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 FROM ${BASE_IMAGE} as centos
 
-ENV PATH=/root/bin:${PATH}
+ENV PATH=/root/bin:/root/.local/bin:${PATH}
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/usr/local/src,sharing=locked \
     dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
