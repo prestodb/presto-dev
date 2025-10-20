@@ -8,6 +8,10 @@ echo "Installing presto"
 cd /opt/presto
 tar --strip-components=1 -xzf /presto/presto-server/target/presto-server-*.tar.gz -C .
 
+echo "Installing router"
+cd /opt/presto
+tar --strip-components=1 -xzf /presto/presto-router/target/presto-router-*.tar.gz -C .
+
 echo "Building prestissimo"
 cd /presto/presto-native-execution
 make debug
