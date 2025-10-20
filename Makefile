@@ -11,6 +11,8 @@ ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 VELOX_SCRIPT_PATCH ?= scripts/velox-script.patch
 ARM_BUILD_TARGET ?= apple
 
+-include .env
+
 .PHONY: centos-dep ubuntu-dep centos-cpp-dev ubuntu-cpp-dev centos-java-dev ubuntu-java-dev \
 	centos-dev ubuntu-dev release-prepare release-publish pull-centos pull-ubuntu \
 	latest-centos latest-ubuntu start-centos start-ubuntu stop-centos stop-ubuntu \

@@ -94,7 +94,7 @@ You can modify the existing configuration files in these profiles or create a ne
 3. Modify the configuration files as needed
 4. Create a `start-cluster` script for your profile
 
-The [presto/data](https://github.com/prestodb/presto-dev/tree/main/presto/data) is mounted as `/opt/presto/data` to persist data between container restarts.
+The [presto/data](./presto/data) is mounted as `/opt/presto/data` to persist data between container restarts.
 
 This approach allows you to maintain multiple configuration profiles and easily switch between them using the `start-cluster` script.
 
@@ -103,7 +103,7 @@ This approach allows you to maintain multiple configuration profiles and easily 
 1. Install [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension.
 2. Open `Remote Explorer` panel, switch to `Dev Containers` from the drop down widget on the top.
 3. Open the `/presto` directory in the composed container `presto-dev` (If importing Maven projects takes a long time, run `./mvnw clean` in the `/presto` directory and `make clean` in the `/presto/presto-native-execution` directory inside the container.).
-4. If `presto/.vscode/launch.json` is not already configured, the file [launch.json](https://github.com/prestodb/presto-dev/tree/main/launch.json) is copied there automatically. If it is already configured, append the contents of [launch.json](https://github.com/prestodb/presto-dev/tree/main/launch.json) from this repository to your existing `presto/.vscode/launch.json`.
+4. If `presto/.vscode/launch.json` is not already configured, the file [launch.json](./launch.json) is copied there automatically. If it is already configured, append the contents of [launch.json](./launch.json) from this repository to your existing `presto/.vscode/launch.json`.
 5. Install Microsoft [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) and [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) in the container.
 6. Start Presto & Prestissimo in the container.
 7. After the Java projects are imported, open the Debug panel and select either `Attach to Prestissimo` or `Attach to Presto` to start debugging.
@@ -236,3 +236,41 @@ Each cluster profile has its own configuration and behavior:
 - **router**: Starts a Presto router and a single node Presto server
 
 The logs for Presto servers are available at `/opt/presto/data/var/log/server.log`, the logs for Prestissimo servers are available at `/opt/prestissimo/logs/server.log`, and the logs for Presto router are available at `/opt/router/logs/server.log`.
+
+## Build your own images
+
+You can build your own images by forking this repository and update [.env](./.env) file to customize your build.
+
+For example, if you want to push the images to your own docker registry, you can add the following lines to [.env](./.env) file:
+
+```
+ORG = <your github org>
+DOCKERHUB = <docker.io, ghcr.io or other registries>
+```
+
+If you want to customize the compiling options like cmake flags or parallel build options, you can also update the [.env](./.env) file:
+
+```
+NUM_THREADS=<number of threads for compiling>
+COMMON_CMAKE_FLAGS=<common shared cmake flags>
+CENTOS_CMAKE_FLAGS=<centos specific cmake flags>
+UBUNTU_CMAKE_FLAGS=<ubuntu specific cmake flags>
+```
+
+In this way, you can build your own images and customize them according to your needs.
+
+To build and push the images, you can use the following commands under directory  `presto-dev`:
+
+```sh
+# Build centos images
+make centos-cpp-dev && make centos-java-dev && make centos-dev
+
+# Build ubuntu images
+make ubuntu-cpp-dev && make ubuntu-java-dev && make ubuntu-dev
+
+# Re-tag images for publishing
+make release-prepare
+
+# Publish images
+make release-publish
+```

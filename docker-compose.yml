@@ -21,17 +21,7 @@ services:
         - BASE_IMAGE=ubuntu:22.04
         - OSNAME=ubuntu
         - ARM_BUILD_TARGET=notlocal
-        - EXTRA_CMAKE_FLAGS=-DPRESTO_ENABLE_TESTING=OFF
-                            -DPRESTO_ENABLE_PARQUET=ON
-                            -DPRESTO_ENABLE_S3=ON
-                            -DPRESTO_ENABLE_REMOTE_FUNCTIONS=ON
-                            -DPRESTO_ENABLE_JWT=ON
-                            -DPRESTO_STATS_REPORTER_TYPE=PROMETHEUS
-                            -DPRESTO_MEMORY_CHECKER_TYPE=LINUX_MEMORY_CHECKER
-                            -DPRESTO_ENABLE_SPATIAL=ON
-                            -DVELOX_BUILD_TESTING=OFF
-                            -DVELOX_ENABLE_SPARK=ON
-                            -DVELOX_ENABLE_SPARK_FUNCTIONS=ON
+        - EXTRA_CMAKE_FLAGS=${UBUNTU_CMAKE_FLAGS} ${COMMON_CMAKE_FLAGS}
       context: ..
       dockerfile: presto-dev/Dockerfile-cpp-dev
       labels:
@@ -50,17 +40,7 @@ services:
       args:
         - DEPENDENCY_IMAGE=presto/prestissimo-dependency:centos9
         - ARM_BUILD_TARGET=notlocal
-        - EXTRA_CMAKE_FLAGS=-DPRESTO_ENABLE_TESTING=ON
-                            -DPRESTO_ENABLE_PARQUET=ON
-                            -DPRESTO_ENABLE_S3=ON
-                            -DPRESTO_ENABLE_REMOTE_FUNCTIONS=ON
-                            -DPRESTO_ENABLE_JWT=ON
-                            -DPRESTO_STATS_REPORTER_TYPE=PROMETHEUS
-                            -DPRESTO_MEMORY_CHECKER_TYPE=LINUX_MEMORY_CHECKER
-                            -DPRESTO_ENABLE_SPATIAL=ON
-                            -DVELOX_BUILD_TESTING=OFF
-                            -DVELOX_ENABLE_SPARK=ON
-                            -DVELOX_ENABLE_SPARK_FUNCTIONS=ON
+        - EXTRA_CMAKE_FLAGS=${CENTOS_CMAKE_FLAGS} ${COMMON_CMAKE_FLAGS}
       context: ..
       dockerfile: presto-dev/Dockerfile-cpp-dev
       labels:
@@ -131,6 +111,7 @@ services:
     volumes:
       - ..:/presto
       - ./root:/root
+      - ./.env:/root/.build-env
       - ./presto/data:/opt/presto/data
       - ./clusters:/opt/clusters
     working_dir: /presto/presto-native-execution
@@ -165,6 +146,7 @@ services:
     volumes:
       - ..:/presto
       - ./root:/root
+      - ./.env:/root/.build-env
       - ./presto/data:/opt/presto/data
       - ./clusters:/opt/clusters
     working_dir: /presto/presto-native-execution

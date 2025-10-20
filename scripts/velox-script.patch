@@ -1,20 +1,3 @@
-diff --git a/scripts/setup-common.sh b/scripts/setup-common.sh
-index 594616649..bb9837c0a 100755
---- a/scripts/setup-common.sh
-+++ b/scripts/setup-common.sh
-@@ -393,7 +393,11 @@ function install_azure-storage-sdk-cpp {
- 
- function install_hdfs_deps {
-   # Dependencies for Hadoop testing
--  wget_and_untar https://archive.apache.org/dist/hadoop/common/hadoop-"${HADOOP_VERSION}"/hadoop-"${HADOOP_VERSION}".tar.gz hadoop
-+  if [ -f "/scripts/hadoop-${HADOOP_VERSION}" ]; then
-+    cp "/scripts/hadoop-${HADOOP_VERSION}" hadoop
-+  else
-+    wget_and_untar https://archive.apache.org/dist/hadoop/common/hadoop-"${HADOOP_VERSION}"/hadoop-"${HADOOP_VERSION}".tar.gz hadoop
-+  fi
-   cp -a "${DEPENDENCY_DIR}"/hadoop "$INSTALL_PREFIX"
-   wget "${WGET_OPTS[@]}" -P "$INSTALL_PREFIX"/hadoop/share/hadoop/common/lib/ https://repo1.maven.org/maven2/junit/junit/4.11/junit-4.11.jar
- }
 diff --git a/scripts/setup-ubuntu.sh b/scripts/setup-ubuntu.sh
 index 3f7b955c5..3947c0618 100755
 --- a/scripts/setup-ubuntu.sh
