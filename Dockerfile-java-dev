@@ -31,7 +31,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
     python3 -m pip install cmake
 
-RUN --mount=type=cache,target=/root/m2 \
+RUN --mount=type=cache,target=/root/m2,sharing=locked \
+    --mount=type=cache,target=/root/.yarn,sharing=locked \
     --mount=type=bind,source=..,target=${BUILD_ROOT},rw \
     cd ${BUILD_ROOT} && \
     export MAVEN_USER_HOME=/root/m2 && \
