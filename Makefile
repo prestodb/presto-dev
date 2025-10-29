@@ -49,11 +49,11 @@ ubuntu-cpp-dev:
 
 centos-java-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
-		$(DOCKER_CMD) compose build centos-java-dev
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) centos-java-dev
 
 ubuntu-java-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
-		$(DOCKER_CMD) compose build ubuntu-java-dev
+		$(DOCKER_CMD) compose build --build-arg CACHE_OPTION=$(CACHE_OPTION) ubuntu-java-dev
 
 centos-dev:
 	env VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \

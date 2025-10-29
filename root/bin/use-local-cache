@@ -13,7 +13,8 @@ fi
 DIRECTORIES=(".m2" ".cache" ".ccache")
 BASE_SOURCE_DIR="/opt/cache"
 
-for dir in "$HOME/${DIRECTORIES[@]}"; do
+for link in "${DIRECTORIES[@]}"; do
+  dir="$HOME/$link"
   if [ -L "$dir" ]; then
     # Get the target of the symbolic link
     target=$(readlink "$dir")
