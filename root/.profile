@@ -11,6 +11,7 @@ export BUILD_BASE_DIR=_build
 
 source /etc/os-release
 source /root/.build-env
+source $SDKMAN_DIR/bin/sdkman-init.sh
 
 if [ "$ID" == "centos" ]; then
   export EXTRA_CMAKE_FLAGS="$CENTOS_CMAKE_FLAGS $COMMON_CMAKE_FLAGS"

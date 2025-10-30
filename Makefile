@@ -145,11 +145,11 @@ stop-ubuntu:
 
 shell-centos: start-centos
 	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
-		${DOCKER_CMD} compose exec centos-dev bash
+		${DOCKER_CMD} compose exec centos-dev bash -l
 
 shell-ubuntu: start-ubuntu
 	VERSION=$(VERSION) COMMIT_ID=$(COMMIT_ID) TIMESTAMP=$(TIMESTAMP) DESCRIPTION=$(DESCRIPTION) \
-		${DOCKER_CMD} compose exec ubuntu-dev bash
+		${DOCKER_CMD} compose exec ubuntu-dev bash -l
 
 start: start-centos
 

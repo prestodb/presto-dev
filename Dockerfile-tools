@@ -14,7 +14,10 @@ ARG BASE_IMAGE=presto/presto-java-dev:centos9
 
 FROM ${BASE_IMAGE} as ubuntu
 
-ENV PATH=/root/bin:/root/.local/bin:${PATH}
+SHELL ["/bin/bash", "-c"]
+
+ENV SDKMAN_DIR=/usr/local/sdkman \
+  PATH=/root/bin:/root/.local/bin:${SDKMAN_DIR}/bin:${PATH}
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && \
@@ -27,14 +30,15 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         iotop strace lsof smartmontools \
         iftop nload bmon iproute2 iputils-ping iperf3 tcpdump ngrep mtr \
         gdb ltrace systemtap systemtap-runtime binutils elfutils \
-        bpfcc-tools bpftrace && \
+        bpfcc-tools bpftrace unzip zip && \
     pip3 install --user podman-compose && \
     # Install Node.js (LTS 20.x)
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     # Install sdkman
     curl -s "https://get.sdkman.io" | bash && \
-    source "/root/.sdkman/bin/sdkman-init.sh" && \
+    ls -la /root && \
+    source "$SDKMAN_DIR/bin/sdkman-init.sh" && \
     sdk install maven && \
     # Enable Corepack and prepare pnpm + yarn
     corepack enable && \
@@ -49,7 +53,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 FROM ${BASE_IMAGE} as centos
 
-ENV PATH=/root/bin:/root/.local/bin:${PATH}
+ENV SDKMAN_DIR=/usr/local/sdkman \
+  PATH=/root/bin:/root/.local/bin:${SDKMAN_DIR}/bin:${PATH}
 RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     --mount=type=cache,target=/usr/local/src,sharing=locked \
     dnf update -y && dnf install -y java-17-openjdk-headless less procps wget diffutils git vim gdb && \
@@ -69,7 +74,7 @@ RUN --mount=type=cache,target=/var/cache/dnf,sharing=locked \
     dnf install -y nodejs && \
     # Install sdkman
     curl -s "https://get.sdkman.io" | bash && \
-    source "/root/.sdkman/bin/sdkman-init.sh" && \
+    source "$SDKMAN_DIR/bin/sdkman-init.sh" && \
     sdk install maven && \
     # Enable Corepack and prepare pnpm + yarn
     corepack enable && \
