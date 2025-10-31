@@ -26,6 +26,20 @@ cd presto-dev
 make
 ```
 
+### Optional: Create aliases for convenience
+
+If you want to start the dev container from anywhere without navigating to the `presto-dev` directory, you can create a shell alias. For example, if your presto workspace is in `~/presto` and you cloned `presto-dev` to `~/presto/presto-dev`, add the following alias to your shell configuration file (e.g., `~/.bashrc`, `~/.zshrc`, or `~/.config/fish/config.fish`):
+
+```sh
+alias presto-dev-shell='pushd ~/presto/presto-dev; make; popd'
+alias presto-dev-update='pushd ~/presto/presto-dev; make pull; git pull; popd'
+alias presto-dev-stop='pushd ~/presto/presto-dev; make stop; popd'
+```
+
+After reloading your shell configuration, you can simply run `presto-dev-shell` from any directory to start the container and enter the shell.
+
+### Work with source code
+
 In the dev container shell, you can run the following commands to work with source code.
 
 ```sh
@@ -49,11 +63,16 @@ yarn install
 yarn serve
 ```
 
+### Update presto-dev image
+
 When a new `presto-dev` image is published, run the following command to pull the latest version.
 
 ```sh
 # Under presto-dev, run this to pull the latest presto-dev image
 make pull
+
+# Or use alias
+presto-dev-pull
 ```
 
 ## Start Presto & Prestissimo server
